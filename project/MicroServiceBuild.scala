@@ -39,7 +39,6 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-json-logger" % playJsonLoggerVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
     "io.github.cloudify" %% "spdf" % "1.3.1",
-    "org.apache.pdfbox" % "pdfbox" % "1.8.2",
     "org.apache.pdfbox" % "preflight" % "2.0.3"
   )
 

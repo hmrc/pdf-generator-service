@@ -22,8 +22,8 @@ object MultipartFormFixture{
   private val dummyFile: File = new File(baseDir + "dummy.txt")
 
 
-  val configFileLocation: String = sys.props.getOrElse("config.location", default = "")
-  val properties = new Properties()
+  private val configFileLocation: String = sys.props.getOrElse("config.location", default = "")
+  private val properties = new Properties()
   properties.load(new FileInputStream(configFileLocation))
   private val pdfa_defsLocation: String = properties.getProperty("pdfa_defs.location")
 

@@ -16,7 +16,6 @@ object GeneratePdfController extends GeneratePdfController
 
 trait GeneratePdfController extends BaseController {
 
-
 	def generatePdfA() = Action.async { implicit request =>
 
 		val multipartFormData: MultipartFormData[TemporaryFile] = request.body.asMultipartFormData.get
