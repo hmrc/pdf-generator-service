@@ -21,11 +21,7 @@ object MultipartFormFixture{
   private val scripTagfile: File = new File(baseDir + "test_withScriptTag.htm")
   private val dummyFile: File = new File(baseDir + "dummy.txt")
 
-
-  private val configFileLocation: String = sys.props.getOrElse("config.location", default = "")
-  private val properties = new Properties()
-  properties.load(new FileInputStream(configFileLocation))
-  private val pdfa_defsLocation: String = properties.getProperty("pdfa_defs.location")
+  private val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
   val pdfaFile: String = Source.fromFile(pdfa_defsLocation).mkString
 

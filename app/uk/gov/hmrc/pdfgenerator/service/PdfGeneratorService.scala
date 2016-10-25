@@ -53,14 +53,7 @@ trait PdfGeneratorService {
   def convertToPdfA(inputFileName : String, outputFileName : String) : File = {
     import scala.sys.process.Process
 
-    val configFileLocation: String = sys.props.getOrElse("config.location", default = "")
-
-    assertConfigFileExists(configFileLocation)
-
-    val properties = new Properties()
-    properties.load(new FileInputStream(configFileLocation))
-
-    val pdfa_defsLocation: String = properties.getProperty("pdfa_defs.location")
+    val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
     val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
       "-sDEVICE=pdfwrite -o " + outputFileName + " " + pdfa_defsLocation + "  " + baseDir + inputFileName
@@ -68,12 +61,6 @@ trait PdfGeneratorService {
     val exitCode = pb.!
 
     return new File(baseDir + outputFileName)
-  }
-
-  private def assertConfigFileExists(configLocation : String) = {
-    if(configLocation == null || configLocation.isEmpty){
-      Future.failed(throw new BadRequestException("config.properties path is not known"))
-    }
   }
 
   def generateCompliantPdfA(html : String, inputFileName : String, outputFileName : String) : File = {

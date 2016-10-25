@@ -29,7 +29,7 @@ All requests use the HTTP `POST` method
 To run the application execute
 
 ```
-sbt ~run 9000 -Dconfig.location=[PATH TO CONFIG FILE]” (e.g. /Users/habeeb/Desktop/work/config.properties)
+sbt ~run 9000 -Dpdfa_defs.location=[PATH TO PDFA_DEFS FILE]” (e.g. /Users/habeeb/Desktop/work/ghostScript/PDFA_def.ps)
 ```
 
 The endpoints can then be accessed with the base url http://localhost:9000/pdf-generator
