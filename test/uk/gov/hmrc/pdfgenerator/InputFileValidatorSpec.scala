@@ -1,6 +1,6 @@
 package uk.gov.hmrc.pdfgenerator
 
-import java.net.URL
+import java.net.{URI, URL}
 
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData.FilePart
@@ -13,17 +13,18 @@ import org.scalatest.{MustMatchers, WordSpec}
 
 import scala.io.Source
 
-object MultipartFormFixture{
+object MultipartFormFixture {
 
-  private val baseDir: String = new File(".").getCanonicalPath + "/"
+  def getFileFromClasspath(name: String): File = {
+    new File (getClass.getResource("/" + name).toURI)
+  }
 
-  private val noScriptTagfile: File = new File(baseDir + "test.htm")
-  private val scripTagfile: File = new File(baseDir + "test_withScriptTag.htm")
-  private val dummyFile: File = new File(baseDir + "dummy.txt")
+  private val noScriptTagfile: File = getFileFromClasspath("test.htm")
+  private val scripTagfile: File = getFileFromClasspath("test_withScriptTag.htm")
+  private val dummyFile: File = getFileFromClasspath("dummy.txt")
+  private val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
 
-  private val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
-
-  val pdfaFile: String = Source.fromFile(pdfa_defsLocation).mkString
+  val pdfaFile: String = Source.fromFile(PDFAdef_psFile).mkString
 
   def completeMultipartFormData_noScriptTags: MultipartFormData[TemporaryFile] = MultipartFormData(
     dataParts = Map(),
