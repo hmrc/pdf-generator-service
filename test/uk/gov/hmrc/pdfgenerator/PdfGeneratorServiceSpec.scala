@@ -7,8 +7,8 @@ import java.util.UUID
 import org.scalatest.{MustMatchers, WordSpec}
 import PdfGeneratorServiceFixture._
 //import org.apache.pdfbox.preflight.{Format, PreflightDocument, ValidationResult}
-import org.apache.pdfbox.preflight.parser.PreflightParser
-import org.apache.pdfbox.text.PDFTextStripper
+//import org.apache.pdfbox.preflight.parser.PreflightParser
+//import org.apache.pdfbox.text.PDFTextStripper
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService._
 import uk.gov.hmrc.play.http.BadRequestException
 
