@@ -6,9 +6,11 @@ import java.util.{Properties, UUID}
 import uk.gov.hmrc.play.http.BadRequestException
 
 import scala.concurrent.Future
+import scala.io.Source
 
 
 object PdfGeneratorService extends PdfGeneratorService
+
 
 /**
   * Created by habeeb on 10/10/2016.
@@ -19,6 +21,11 @@ object PdfGeneratorService extends PdfGeneratorService
   */
 trait PdfGeneratorService {
 
+  def getFileFromClasspath(name: String): File = {
+    new File (getClass.getResource("/" + name).toURI)
+  }
+
+  private val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
   val baseDir: String = new File(".").getCanonicalPath + "/"
 
   def generatePdfFromHtml(html : String, outputFileName : String) : File = {
@@ -53,10 +60,11 @@ trait PdfGeneratorService {
   def convertToPdfA(inputFileName : String, outputFileName : String) : File = {
     import scala.sys.process.Process
 
+
     val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
-    val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
-      "-sDEVICE=pdfwrite -o " + outputFileName + " " + pdfa_defsLocation + "  " + baseDir + inputFileName
+    val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + baseDir + inputFileName
+    //val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o PDFAcompliant.pdf" + " " + pdfa_defsLocation2 + " " + "non-compliant.pdf"
     val pb = Process(command)
     val exitCode = pb.!
 
