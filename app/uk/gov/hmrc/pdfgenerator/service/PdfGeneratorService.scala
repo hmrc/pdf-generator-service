@@ -76,7 +76,7 @@ trait PdfGeneratorService {
 //            marginRight := "1in"
 //    })
 
-    val destinationDocument: File = new File(outputFileName)
+    val destinationDocument: File = new File("/app/" + outputFileName)
     pdf.run(html, destinationDocument)
 
     return destinationDocument
