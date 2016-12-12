@@ -22,8 +22,8 @@ trait GeneratePdfController extends BaseController {
 
 		val fileContents : String = validate(multipartFormData)
 
-		val inputFileName: String = UUID.randomUUID.toString + ".pdf"
-		val outputFileName: String = UUID.randomUUID.toString + ".pdf"
+		val inputFileName: String = "/app/" + UUID.randomUUID.toString + ".pdf"
+		val outputFileName: String = "/app/" +  UUID.randomUUID.toString + ".pdf"
 
 		val pdfA: File = generateCompliantPdfA(fileContents, inputFileName, outputFileName)
 
