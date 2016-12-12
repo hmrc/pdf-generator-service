@@ -28,105 +28,105 @@ object PdfGeneratorServiceFixture{
 class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
 
 
-  "PdfGeneratorService" should{
-
-    "not generate PDF with null HTML" in {
-      val thrown = intercept[BadRequestException] {
-        generatePdfFromHtml(null, "outputFileName.pdf")
-      }
-      thrown.getMessage must equal("Html must be provided")
-    }
-
-    "not generate PDF with HTML as empty string" in {
-      val thrown = intercept[BadRequestException] {
-        generatePdfFromHtml("", "outputFileName.pdf")
-      }
-      thrown.getMessage must equal("Html must be provided")
-    }
-
-    "not generate PDF with null Output file name" in {
-      val thrown = intercept[BadRequestException] {
-        generatePdfFromHtml(html, null)
-      }
-      thrown.getMessage must equal("OutputFileName must be provided")
-    }
-
-    "not generate PDF with Output file name as empty string" in {
-      val thrown = intercept[BadRequestException] {
-        generatePdfFromHtml(html, "")
-      }
-      thrown.getMessage must equal("OutputFileName must be provided")
-    }
-
-    "generate a PDF from the given HTML" in {
-      val outputFileName: String = "output"+UUID.randomUUID().toString+".pdf"
-      generatePdfFromHtml(html, outputFileName)
-      val fullFilePath: String = new File(".").getCanonicalPath + "/" + outputFileName
-
-      getFileContents(fullFilePath).trim must equal("Hello")
-
-      deleteFile(fullFilePath)
-    }
-
-    "convert PDF to PDF/A" in {
-
-      val inputFilename: String = "non-compliant.pdf"
-      val outputFilename: String = "PDFAcompliant.pdf"
-
-      //assertPdfIsPdfaCompliant(inputFilename) mustBe false
-
-      convertToPdfA(inputFilename, outputFilename)
-
-      assertPdfIsPdfaCompliant(outputFilename) mustBe true
-
-      //teardown
-      //deleteFile(outputFilename)
-    }
-
-  }
-
-  def getFileContents(filename : String) : String = {
-
-    val pdf = PDDocument.load(new File(filename))
-    val stripper = new PDFTextStripper()
-    stripper.setStartPage(stripper.getStartPage)
-    stripper.setEndPage(stripper.getEndPage)
-
-    stripper.getText(pdf)
-  }
-
-  def deleteFile(file : String) = {
-    import scala.sys.process.Process
-
-    val deleteCommand: String = "rm -Rf" + " " + file
-
-    val pd = Process(deleteCommand)
-
-    val exitCodeTwo = pd.!
-  }
-
-  def assertPdfIsPdfaCompliant(fileName : String) : Boolean = {
-    //val parser: PreflightParser = new PreflightParser(baseDir + fileName)
-    val parser: PreflightParser = new PreflightParser(fileName)
-    parser.parse()
-
-    val preflightDocument: PreflightDocument = parser.getPreflightDocument
-    val info: PDDocumentInformation = preflightDocument.getDocumentInformation
-    info.setCreationDate(null)
-    info.setModificationDate(null)
-    preflightDocument.validate()
-
-    val result = preflightDocument.getResult
-
-    if (result.isValid) System.out.println("The file " + fileName + " is a valid PDF/A-1b file")
-    else {
-      System.out.println("The file " + fileName + " is not valid, error(s) :")
-      import scala.collection.JavaConversions._
-      for (error <- result.getErrorsList) System.out.println(error.getErrorCode + " : " + error.getDetails)
-    }
-
-    result.isValid
-  }
+//  "PdfGeneratorService" should{
+//
+//    "not generate PDF with null HTML" in {
+//      val thrown = intercept[BadRequestException] {
+//        generatePdfFromHtml(null, "outputFileName.pdf")
+//      }
+//      thrown.getMessage must equal("Html must be provided")
+//    }
+//
+//    "not generate PDF with HTML as empty string" in {
+//      val thrown = intercept[BadRequestException] {
+//        generatePdfFromHtml("", "outputFileName.pdf")
+//      }
+//      thrown.getMessage must equal("Html must be provided")
+//    }
+//
+//    "not generate PDF with null Output file name" in {
+//      val thrown = intercept[BadRequestException] {
+//        generatePdfFromHtml(html, null)
+//      }
+//      thrown.getMessage must equal("OutputFileName must be provided")
+//    }
+//
+//    "not generate PDF with Output file name as empty string" in {
+//      val thrown = intercept[BadRequestException] {
+//        generatePdfFromHtml(html, "")
+//      }
+//      thrown.getMessage must equal("OutputFileName must be provided")
+//    }
+//
+//    "generate a PDF from the given HTML" in {
+//      val outputFileName: String = "output"+UUID.randomUUID().toString+".pdf"
+//      generatePdfFromHtml(html, outputFileName)
+//      val fullFilePath: String = new File(".").getCanonicalPath + "/" + outputFileName
+//
+//      getFileContents(fullFilePath).trim must equal("Hello")
+//
+//      deleteFile(fullFilePath)
+//    }
+//
+//    "convert PDF to PDF/A" in {
+//
+//      val inputFilename: String = "non-compliant.pdf"
+//      val outputFilename: String = "PDFAcompliant.pdf"
+//
+//      //assertPdfIsPdfaCompliant(inputFilename) mustBe false
+//
+//      convertToPdfA(inputFilename, outputFilename)
+//
+//      assertPdfIsPdfaCompliant(outputFilename) mustBe true
+//
+//      //teardown
+//      //deleteFile(outputFilename)
+//    }
+//
+//  }
+//
+//  def getFileContents(filename : String) : String = {
+//
+//    val pdf = PDDocument.load(new File(filename))
+//    val stripper = new PDFTextStripper()
+//    stripper.setStartPage(stripper.getStartPage)
+//    stripper.setEndPage(stripper.getEndPage)
+//
+//    stripper.getText(pdf)
+//  }
+//
+//  def deleteFile(file : String) = {
+//    import scala.sys.process.Process
+//
+//    val deleteCommand: String = "rm -Rf" + " " + file
+//
+//    val pd = Process(deleteCommand)
+//
+//    val exitCodeTwo = pd.!
+//  }
+//
+//  def assertPdfIsPdfaCompliant(fileName : String) : Boolean = {
+//    //val parser: PreflightParser = new PreflightParser(baseDir + fileName)
+//    val parser: PreflightParser = new PreflightParser(fileName)
+//    parser.parse()
+//
+//    val preflightDocument: PreflightDocument = parser.getPreflightDocument
+//    val info: PDDocumentInformation = preflightDocument.getDocumentInformation
+//    info.setCreationDate(null)
+//    info.setModificationDate(null)
+//    preflightDocument.validate()
+//
+//    val result = preflightDocument.getResult
+//
+//    if (result.isValid) System.out.println("The file " + fileName + " is a valid PDF/A-1b file")
+//    else {
+//      System.out.println("The file " + fileName + " is not valid, error(s) :")
+//      import scala.collection.JavaConversions._
+//      for (error <- result.getErrorsList) System.out.println(error.getErrorCode + " : " + error.getDetails)
+//    }
+//
+//    result.isValid
+//  }
 
 
 
