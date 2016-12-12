@@ -22,7 +22,9 @@ object PdfGeneratorService extends PdfGeneratorService
 trait PdfGeneratorService {
 
   def getFileFromClasspath(name: String): File = {
-    new File (getClass.getResource("/" + name).toURI)
+    //val source = Source.fromURL(getClass.getResource("/" + name)).
+    val path = (getClass.getResource("/" + name)).getPath
+    new File(path)
   }
 
   private val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
