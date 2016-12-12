@@ -31,7 +31,7 @@ trait PdfGeneratorService {
   }
 
   private val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
-  val baseDir: String = new File(".").getCanonicalPath + "/"
+  val baseDir: String = "/app/"
 
   def generatePdfFromHtml(html : String, outputFileName : String) : File = {
     import io.github.cloudify.scala.spdf._
