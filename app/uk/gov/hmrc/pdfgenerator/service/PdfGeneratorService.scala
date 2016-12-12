@@ -31,7 +31,7 @@ trait PdfGeneratorService {
   }
 
   private val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
-  val baseDir: String = "/app/"
+  //val baseDir: String = "/app/"
 
   def generatePdfFromHtml(html : String, outputFileName : String) : File = {
     import io.github.cloudify.scala.spdf._
@@ -88,12 +88,12 @@ trait PdfGeneratorService {
 
     val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
-    val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + baseDir + inputFileName
+    val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + inputFileName
     //val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o PDFAcompliant.pdf" + " " + pdfa_defsLocation2 + " " + "non-compliant.pdf"
     val pb = Process(command)
     val exitCode = pb.!
 
-    return new File(baseDir + outputFileName)
+    return new File(outputFileName)
   }
 
   def generateCompliantPdfA(html : String, inputFileName : String, outputFileName : String) : File = {
@@ -103,7 +103,7 @@ trait PdfGeneratorService {
 
     val pdfA: File = convertToPdfA(inputFileName, outputFileName)
 
-    val deleteCommand: String = "rm -Rf" + " " + baseDir + inputFileName
+    val deleteCommand: String = "rm -Rf" + " " + inputFileName
     val pd = Process(deleteCommand)
     val exitCodeTwo = pd.!
 
