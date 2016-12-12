@@ -3,11 +3,11 @@ package uk.gov.hmrc.pdfgenerator.service
 import java.io.{File, FileInputStream}
 import java.util.{Properties, UUID}
 
+import play.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
 import scala.concurrent.Future
 import scala.io.Source
-
 import scala.sys.process._
 
 
@@ -37,6 +37,7 @@ trait PdfGeneratorService {
     import io.github.cloudify.scala.spdf._
     import java.io._
 
+    Logger.info("InputFileName before generate is called " + outputFileName)
     if(html == null || html.isEmpty){
       Future.failed(throw new BadRequestException("Html must be provided"))
     }
@@ -85,11 +86,13 @@ trait PdfGeneratorService {
   def convertToPdfA(inputFileName : String, outputFileName : String) : File = {
     import scala.sys.process.Process
 
-
+    Logger.info("InputFileName before GS is called " + inputFileName)
+    Logger.info("OutputFileName before GS is called " + outputFileName)
     val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
     val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + inputFileName
     //val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o PDFAcompliant.pdf" + " " + pdfa_defsLocation2 + " " + "non-compliant.pdf"
+    Logger.info("GS command is " + command)
     val pb = Process(command)
     val exitCode = pb.!
 
@@ -103,7 +106,9 @@ trait PdfGeneratorService {
 
     val pdfA: File = convertToPdfA(inputFileName, outputFileName)
 
+
     val deleteCommand: String = "rm -Rf" + " " + inputFileName
+    Logger.info("InputFileName when deleted " + inputFileName)
     val pd = Process(deleteCommand)
     val exitCodeTwo = pd.!
 
