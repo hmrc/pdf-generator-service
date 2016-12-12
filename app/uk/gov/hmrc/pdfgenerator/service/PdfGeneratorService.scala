@@ -8,6 +8,8 @@ import uk.gov.hmrc.play.http.BadRequestException
 import scala.concurrent.Future
 import scala.io.Source
 
+import scala.sys.process._
+
 
 object PdfGeneratorService extends PdfGeneratorService
 
@@ -24,6 +26,7 @@ trait PdfGeneratorService {
   def getFileFromClasspath(name: String): File = {
     //val source = Source.fromURL(getClass.getResource("/" + name)).
     val path = (getClass.getResource("/" + name)).getPath
+    //val reader = new BufferedReader(new InputStreamReader(istream));
     new File(path)
   }
 
@@ -44,13 +47,33 @@ trait PdfGeneratorService {
 
     // Create a new Pdf converter with a custom configuration
     // run `wkhtmltopdf --extended-help` for a full list of options
-    val pdf = Pdf(new PdfConfig {
-      orientation := Portrait
-      pageSize := "A4"
-      marginTop := "1in"
-      marginBottom := "1in"
-      marginLeft := "1in"
-      marginRight := "1in"
+
+    class myPdfConfig extends PdfConfig {
+
+      def findExecutable: Option[String] = try {
+      Option("which wkhtmltopdf".!!.trim).filter(_.nonEmpty)
+      } catch {
+        case _: RuntimeException => Option("/app/bin/wkhtmltopdf")
+      }
+    }
+
+
+//    val pdf = Pdf(new PdfConfig {
+//      orientation := Portrait
+//      pageSize := "A4"
+//      marginTop := "1in"
+//      marginBottom := "1in"
+//      marginLeft := "1in"
+//      marginRight := "1in"
+//    })
+
+    val pdf = Pdf( new myPdfConfig {
+            orientation := Portrait
+            pageSize := "A4"
+            marginTop := "1in"
+            marginBottom := "1in"
+            marginLeft := "1in"
+            marginRight := "1in"
     })
 
     val destinationDocument: File = new File(outputFileName)
