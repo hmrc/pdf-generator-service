@@ -27,7 +27,7 @@ object PdfGeneratorServiceFixture{
 
 class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
 
-
+//
 //  "PdfGeneratorService" should{
 //
 //    "not generate PDF with null HTML" in {

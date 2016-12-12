@@ -58,23 +58,23 @@ trait PdfGeneratorService {
     }
 
 
-//    val pdf = Pdf(new PdfConfig {
-//      orientation := Portrait
-//      pageSize := "A4"
-//      marginTop := "1in"
-//      marginBottom := "1in"
-//      marginLeft := "1in"
-//      marginRight := "1in"
-//    })
-
-    val pdf = Pdf( new myPdfConfig {
-            orientation := Portrait
-            pageSize := "A4"
-            marginTop := "1in"
-            marginBottom := "1in"
-            marginLeft := "1in"
-            marginRight := "1in"
+    val pdf = Pdf( "/app/bin/wkhtmltopdf", new PdfConfig {
+      orientation := Portrait
+      pageSize := "A4"
+      marginTop := "1in"
+      marginBottom := "1in"
+      marginLeft := "1in"
+      marginRight := "1in"
     })
+//
+//    val pdf = Pdf( new myPdfConfig {
+//            orientation := Portrait
+//            pageSize := "A4"
+//            marginTop := "1in"
+//            marginBottom := "1in"
+//            marginLeft := "1in"
+//            marginRight := "1in"
+//    })
 
     val destinationDocument: File = new File(outputFileName)
     pdf.run(html, destinationDocument)
