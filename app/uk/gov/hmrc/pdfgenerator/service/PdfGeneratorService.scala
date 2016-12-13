@@ -105,9 +105,6 @@ trait PdfGeneratorService {
 
       val file: File = generatePdfFromHtml(html, inputFileName)
       Logger.info("generated file path is " + file.getAbsolutePath)
-
-
-
       val pdfA: File = convertToPdfA(inputFileName, outputFileName)
 
 
