@@ -93,7 +93,7 @@ trait PdfGeneratorService {
       val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
       Logger.info("GS command is " + command)
       val pb = Process(command)
-      val exitCode = pb.!!.toString
+      val exitCode = pb.!
 
       Logger.info("errors are " + exitCode )
 
