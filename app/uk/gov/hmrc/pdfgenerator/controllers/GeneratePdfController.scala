@@ -27,6 +27,10 @@ trait GeneratePdfController extends BaseController {
 		val outputFileName: String = "/app/" +  UUID.randomUUID.toString + ".pdf"
     Logger.info("InputFileName initial is " + inputFileName)
     Logger.info("OutputFileName initial " + outputFileName)
+		val command = "find  / -type d -name app "
+		val command2 = "find  / -type d -name /app/ "
+		Logger.info("without slashes " + command)
+		Logger.info("with slashes " + command2)
 		val pdfA: File = generateCompliantPdfA(fileContents, inputFileName, outputFileName)
 
 
