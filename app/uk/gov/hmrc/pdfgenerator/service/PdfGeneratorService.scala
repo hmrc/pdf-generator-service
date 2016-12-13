@@ -30,7 +30,8 @@ trait PdfGeneratorService {
     new File(path)
   }
 
-  private val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
+  val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
+  val pDFAdef_path = PDFAdef_psFile.getPath
   //val baseDir: String = "/app/"
 
   def generatePdfFromHtml(html: String, outputFileName: String): File = {
@@ -84,7 +85,7 @@ trait PdfGeneratorService {
       Logger.info("OutputFileName before GS is called " + outputFileName)
       val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
-      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + inputFileName
+      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
       //val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o PDFAcompliant.pdf" + " " + pdfa_defsLocation2 + " " + "non-compliant.pdf"
       Logger.info("GS command is " + command)
       val pb = Process(command)
