@@ -3,6 +3,7 @@ package uk.gov.hmrc.pdfgenerator.service
 import java.io.{File, FileInputStream}
 import java.util.{Properties, UUID}
 
+import com.sun.deploy.util.StringUtils
 import play.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
@@ -29,10 +30,13 @@ trait PdfGeneratorService {
   }
 
   val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
-  val pDFAdef_path = PDFAdef_psFile.getPath
+  val pDFAdef_path = PDFAdef_psFile.getCanonicalPath
   Logger.info("pdfa path is " + pDFAdef_path)
+  val contents = PDFAdef_psFile.toString
+  Logger.info(contents)
+
   //val baseDir: String = "/app/"
-  //+ PDFAdef_psFile +
+
 
   def generatePdfFromHtml(html: String, outputFileName: String): File = {
     import io.github.cloudify.scala.spdf._
@@ -71,7 +75,7 @@ trait PdfGeneratorService {
       Logger.info("OutputFileName before GS is called " + outputFileName)
       val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
-      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + " " + inputFileName
+      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + inputFileName
       Logger.info("GS command is " + command)
       val pb = Process(command)
       val exitCode = pb.!
