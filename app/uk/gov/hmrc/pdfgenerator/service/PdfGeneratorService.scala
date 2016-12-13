@@ -3,7 +3,6 @@ package uk.gov.hmrc.pdfgenerator.service
 import java.io.{File, FileInputStream}
 import java.util.{Properties, UUID}
 
-import com.sun.deploy.util.StringUtils
 import play.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
