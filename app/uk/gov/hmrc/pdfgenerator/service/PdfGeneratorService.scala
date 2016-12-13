@@ -31,8 +31,15 @@ trait PdfGeneratorService {
   val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
   val pDFAdef_path = PDFAdef_psFile.getCanonicalPath
   Logger.info("pdfa path is " + pDFAdef_path)
-  val contents = PDFAdef_psFile.toString
-  Logger.info("contents of file" + contents)
+
+  val pDFAdef_abPAth = PDFAdef_psFile.getAbsolutePath
+  Logger.info("pdfa absolute path is" + pDFAdef_abPAth)
+
+  val icc_File: File = getFileFromClasspath("AdobeRGB1998.icc")
+  val icc_abPath = icc_File.getAbsolutePath
+  Logger.info("icc abso path is " + icc_abPath)
+  val icc_cPath = icc_File.getCanonicalPath
+  Logger.info("icc can path is " + icc_cPath)
 
   //val baseDir: String = "/app/"
 
@@ -77,9 +84,7 @@ trait PdfGeneratorService {
       val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
       Logger.info("GS command is " + command)
       val pb = Process(command)
-      val exitCode = pb.!!
-      
-      Logger.info(exitCode)
+      val exitCode = pb.!
 
       new File(outputFileName)
     }
