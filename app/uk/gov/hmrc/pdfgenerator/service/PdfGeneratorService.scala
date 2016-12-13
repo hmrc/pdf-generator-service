@@ -32,6 +32,7 @@ trait PdfGeneratorService {
 
   val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
   val pDFAdef_path = PDFAdef_psFile.getPath
+  Logger.info("pdfa path is " + pDFAdef_path)
   //val baseDir: String = "/app/"
 
   def generatePdfFromHtml(html: String, outputFileName: String): File = {
