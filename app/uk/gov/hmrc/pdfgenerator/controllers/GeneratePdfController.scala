@@ -3,13 +3,12 @@ package uk.gov.hmrc.pdfgenerator.controllers
 import java.io.File
 import java.util.UUID
 
-import play.api.libs.Files.TemporaryFile
-import play.api.libs.json.JsValue
-import uk.gov.hmrc.play.microservice.controller.BaseController
-import play.api.mvc._
-import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService._
-import InputFileValidator._
 import play.Logger
+import play.api.libs.Files.TemporaryFile
+import play.api.mvc._
+import uk.gov.hmrc.pdfgenerator.controllers.InputFileValidator._
+import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService._
+import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.Future
 import scala.sys.process.Process
@@ -24,8 +23,11 @@ trait GeneratePdfController extends BaseController {
 
 		val fileContents : String = validate(multipartFormData)
 
-		val inputFileName: String = "/app/" + UUID.randomUUID.toString + ".pdf"
-		val outputFileName: String = "/app/" +  UUID.randomUUID.toString + ".pdf"
+//		val inputFileName: String = "/app/" + UUID.randomUUID.toString + ".pdf"
+//		val outputFileName: String = "/app/" +  UUID.randomUUID.toString + ".pdf"
+
+		val inputFileName: String = UUID.randomUUID.toString + ".pdf"
+		val outputFileName: String = UUID.randomUUID.toString + ".pdf"
     Logger.info("InputFileName initial is " + inputFileName)
     Logger.info("OutputFileName initial " + outputFileName)
 		val command = "find  / -type d -name app "
