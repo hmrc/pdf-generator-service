@@ -1,14 +1,18 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.{File, FileInputStream}
+import java.nio.file.{Paths, Path}
 import java.util.{Properties, UUID}
 
+import com.sun.tools.javac.util.ListBuffer
 import play.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 import scala.io.Source
 import scala.sys.process._
+import scala.util.{Failure, Success}
 
 
 object PdfGeneratorService extends PdfGeneratorService
@@ -82,12 +86,47 @@ trait PdfGeneratorService {
       val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
       val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
-      Logger.info("GS command is " + command)
-      val pb = Process(command)
-      val exitCode = pb.!
+//      Logger.info("GS command is " + command)
+//      val pb = Process(command)
+//      val exitCode = pb.!!.toString
+//
+//      Logger.info("errors are " + exitCode )
+      run(command)
 
       new File(outputFileName)
     }
+
+  sealed abstract class Result
+
+  case class Success(result: List[String]) extends Result
+
+  case class Failure(message: String) extends Result
+
+  def run(cmd: String): Either[Failure, Success] = {
+    run(cmd, Paths.get("."))
+  }
+
+  def run(cmd: String, in: Path): Either[Failure, Success] = {
+
+    val pb = Process(cmd, cwd = in.toFile)
+
+    val out = ListBuffer[String]()
+    val err = ListBuffer[String]()
+
+    val logger = ProcessLogger((s) => out.append(s), (e) => err.append(e))
+    val process: Process = pb.run(logger)
+    val exitCode = process.exitValue()
+    process.destroy()
+
+    if (exitCode != 0)
+      Left(Failure(
+        s"""
+           |got exit code $exitCode from command $cmd"
+           |got following errors from command $cmd \n  ${err.mkString("\n  ")}
+           """.stripMargin
+      ))
+    else Right(Success(out.toList))
+  }
 
     def generateCompliantPdfA(html: String, inputFileName: String, outputFileName: String): File = {
       import scala.sys.process.Process
