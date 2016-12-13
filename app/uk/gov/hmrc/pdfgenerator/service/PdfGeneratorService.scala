@@ -24,9 +24,7 @@ object PdfGeneratorService extends PdfGeneratorService
 trait PdfGeneratorService {
 
   def getFileFromClasspath(name: String): File = {
-    //val source = Source.fromURL(getClass.getResource("/" + name)).
     val path = (getClass.getResource("/" + name)).getPath
-    //val reader = new BufferedReader(new InputStreamReader(istream));
     new File(path)
   }
 
@@ -34,6 +32,7 @@ trait PdfGeneratorService {
   val pDFAdef_path = PDFAdef_psFile.getPath
   Logger.info("pdfa path is " + pDFAdef_path)
   //val baseDir: String = "/app/"
+  //+ PDFAdef_psFile +
 
   def generatePdfFromHtml(html: String, outputFileName: String): File = {
     import io.github.cloudify.scala.spdf._
@@ -47,20 +46,6 @@ trait PdfGeneratorService {
     if (outputFileName == null || outputFileName.isEmpty) {
       Future.failed(throw new BadRequestException("OutputFileName must be provided"))
     }
-
-
-    // Create a new Pdf converter with a custom configuration
-    // run `wkhtmltopdf --extended-help` for a full list of options
-
-//    class myPdfConfig extends PdfConfig {
-//      //
-//      //      def findExecutable: Option[String] = try {
-//      //      Option("which wkhtmltopdf".!!.trim).filter(_.nonEmpty)
-//      //      } catch {
-//      //        case _: RuntimeException => Option("/app/bin/wkhtmltopdf")
-//      //      }
-      //    }
-
 
       val pdf = Pdf("/app/bin/wkhtmltopdf", new PdfConfig {
         orientation := Portrait
@@ -86,8 +71,7 @@ trait PdfGeneratorService {
       Logger.info("OutputFileName before GS is called " + outputFileName)
       val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
-      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
-      //val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o PDFAcompliant.pdf" + " " + pdfa_defsLocation2 + " " + "non-compliant.pdf"
+      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + " " + inputFileName
       Logger.info("GS command is " + command)
       val pb = Process(command)
       val exitCode = pb.!
