@@ -1,17 +1,10 @@
 package uk.gov.hmrc.pdfgenerator.service
 
-import java.io.{File, FileInputStream}
-import java.nio.file.{Paths, Path}
-import java.util.{Properties, UUID}
+import java.io.{BufferedWriter, File, FileWriter}
 
-import play.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
-import scala.io.Source
-import scala.sys.process._
-import scala.util.{Failure, Success}
 
 
 object PdfGeneratorService extends PdfGeneratorService
@@ -26,97 +19,107 @@ object PdfGeneratorService extends PdfGeneratorService
   */
 trait PdfGeneratorService {
 
-  def getFileFromClasspath(name: String): File = {
-    val path = (getClass.getResource("/" + name)).getPath
-    new File(path)
-  }
+  private val GS_ALIAS = "gs"
+//  private val GS_ALIAS = "/app/bin/gs-920-linux_x86_64"
+  private val baseDir: String = new File(".").getCanonicalPath + "/"
+  //  val baseDir: String = "/app/" // will eventually become "/app/scratch/"
+  private val CONF_DIR = "/Users/work/Desktop/temp/"
+//  private val CONF_DIR = "/app/"
 
-  val PDFAdef_psFile: File = getFileFromClasspath("PDFA_def.ps")
-  val pDFAdef_path = PDFAdef_psFile.getCanonicalPath
-  Logger.info("pdfa path is " + pDFAdef_path)
+  private val pdfs_def = "PDFA_def.ps"
+  private val PDFA_CONF = CONF_DIR + pdfs_def
+  private val adobeColorProfile = "AdobeRGB1998.icc"
+  private val ICC_CONF = CONF_DIR + adobeColorProfile
 
-  val pDFAdef_abPAth = PDFAdef_psFile.getAbsolutePath
-  Logger.info("pdfa absolute path is" + pDFAdef_abPAth)
-
-  val icc_File: File = getFileFromClasspath("AdobeRGB1998.icc")
-  val icc_abPath = icc_File.getAbsolutePath
-  Logger.info("icc abso path is " + icc_abPath)
-  val icc_cPath = icc_File.getCanonicalPath
-  Logger.info("icc can path is " + icc_cPath)
-
-  val pdfaFile: String = Source.fromFile(PDFAdef_psFile).mkString
-  Logger.info("ps file contents are " + pdfaFile)
-
-  val iccFile: String = Source.fromFile(icc_File).mkString
-  Logger.info("icc file contents are " + iccFile)
-
-  //val baseDir: String = "/app/"
-
-
-  def generatePdfFromHtml(html: String, outputFileName: String): File = {
-    import io.github.cloudify.scala.spdf._
+  def generatePdfFromHtml(html : String, outputFileName : String) : File = {
     import java.io._
 
-    Logger.info("InputFileName before generate is called " + outputFileName)
-    if (html == null || html.isEmpty) {
+    import io.github.cloudify.scala.spdf._
+
+    if(html == null || html.isEmpty){
       Future.failed(throw new BadRequestException("Html must be provided"))
     }
 
-    if (outputFileName == null || outputFileName.isEmpty) {
+    if(outputFileName == null || outputFileName.isEmpty){
       Future.failed(throw new BadRequestException("OutputFileName must be provided"))
     }
 
-      val pdf = Pdf("/app/bin/wkhtmltopdf", new PdfConfig {
-        orientation := Portrait
-        pageSize := "A4"
-        marginTop := "1in"
-        marginBottom := "1in"
-        marginLeft := "1in"
-        marginRight := "1in"
-        disableExternalLinks := true
-        disableInternalLinks := true
-      })
+    //      val pdf = Pdf("/app/bin/wkhtmltopdf", new PdfConfig {
+    ////        orientation := Portrait
+    ////        pageSize := "A4"
+    ////        marginTop := "1in"
+    ////        marginBottom := "1in"
+    ////        marginLeft := "1in"
+    ////        marginRight := "1in"
+    ////        disableExternalLinks := true
+    ////        disableInternalLinks := true
+    ////      })
+    //
 
-      val destinationDocument: File = new File(outputFileName)
-      pdf.run(html, destinationDocument)
+    // Create a new Pdf converter with a custom configuration
+    // run `wkhtmltopdf --extended-help` for a full list of options
+    val pdf = Pdf(new PdfConfig {
+      orientation := Portrait
+      pageSize := "A4"
+      marginTop := "1in"
+      marginBottom := "1in"
+      marginLeft := "1in"
+      marginRight := "1in"
+    })
 
-      destinationDocument
+    val destinationDocument: File = new File(outputFileName)
+    pdf.run(html, destinationDocument)
+
+    return destinationDocument
+  }
+
+  def convertToPdfA(inputFileName : String, outputFileName : String) : File = {
+    import scala.sys.process.Process
+
+    setUpConfigFile(pdfs_def, PDFA_CONF)
+    setUpConfigFile(adobeColorProfile, ICC_CONF)
+
+    val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
+      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PDFA_CONF + "  " + baseDir + inputFileName
+    val pb = Process(command)
+    val exitCode = pb.!
+
+    return new File(baseDir + outputFileName)
+  }
+
+  def generateCompliantPdfA(html : String, inputFileName : String, outputFileName : String) : File = {
+    import scala.sys.process.Process
+
+    val file: File = generatePdfFromHtml(html, inputFileName)
+
+    val pdfA: File = convertToPdfA(inputFileName, outputFileName)
+
+    val deleteCommand: String = "rm -Rf" + " " + baseDir + inputFileName
+    val pd = Process(deleteCommand)
+    val exitCodeTwo = pd.!
+
+    return pdfA
+  }
+
+  def setUpConfigFile(fileName:String, configPath:String) : Unit = {
+
+    if(new File(configPath).exists){
+      return
     }
+    val file = new File(configPath)
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(toSource(fileName).mkString)
+    bw.close()
+  }
 
-    def convertToPdfA(inputFileName: String, outputFileName: String): File = {
-      import scala.sys.process.Process
+  def toSource(fileName:String): scala.io.BufferedSource = {
+    import java.nio.charset.{Charset, CodingErrorAction}
 
-      Logger.info("InputFileName before GS is called " + inputFileName)
-      Logger.info("OutputFileName before GS is called " + outputFileName)
-      val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
+    val resource = getClass.getResourceAsStream("/" + fileName)
 
-      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
-      Logger.info("GS command is " + command)
-      val pb = Process(command)
-      val exitCode = pb.!
+    val decoder = Charset.forName("UTF-8").newDecoder()
+    decoder.onMalformedInput(CodingErrorAction.IGNORE)
+    scala.io.Source.fromInputStream(resource)(decoder)
+  }
 
-      Logger.info("errors are " + exitCode )
-
-      new File(outputFileName)
-    }
-
-    def generateCompliantPdfA(html: String, inputFileName: String, outputFileName: String): File = {
-      import scala.sys.process.Process
-
-      val file: File = generatePdfFromHtml(html, inputFileName)
-      Logger.info("generated file path is " + file.getAbsolutePath)
-
-
-
-      val pdfA: File = convertToPdfA(inputFileName, outputFileName)
-
-
-      val deleteCommand: String = "rm -Rf" + " " + inputFileName
-      Logger.info("InputFileName when deleted " + inputFileName)
-      Logger.info("OutputFileNAme when deleted " + outputFileName)
-      val pd = Process(deleteCommand)
-      val exitCodeTwo = pd.!
-
-      return pdfA
-    }
 }
