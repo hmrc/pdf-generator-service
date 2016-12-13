@@ -44,6 +44,12 @@ trait PdfGeneratorService {
   val icc_cPath = icc_File.getCanonicalPath
   Logger.info("icc can path is " + icc_cPath)
 
+  val pdfaFile: String = Source.fromFile(PDFAdef_psFile).mkString
+  Logger.info("ps file contents are " + pdfaFile)
+
+  val iccFile: String = Source.fromFile(icc_File).mkString
+  Logger.info("icc file contents are " + iccFile)
+
   //val baseDir: String = "/app/"
 
 
@@ -90,7 +96,6 @@ trait PdfGeneratorService {
       val exitCode = pb.!!.toString
 
       Logger.info("errors are " + exitCode )
-
 
       new File(outputFileName)
     }
