@@ -4,7 +4,6 @@ import java.io.{File, FileInputStream}
 import java.nio.file.{Paths, Path}
 import java.util.{Properties, UUID}
 
-import com.sun.tools.javac.util.ListBuffer
 import play.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
