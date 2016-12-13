@@ -32,7 +32,7 @@ trait PdfGeneratorService {
   val pDFAdef_path = PDFAdef_psFile.getCanonicalPath
   Logger.info("pdfa path is " + pDFAdef_path)
   val contents = PDFAdef_psFile.toString
-  Logger.info(contents)
+  Logger.info("contents of file" + contents)
 
   //val baseDir: String = "/app/"
 
@@ -74,7 +74,7 @@ trait PdfGeneratorService {
       Logger.info("OutputFileName before GS is called " + outputFileName)
       val pdfa_defsLocation: String = sys.props.getOrElse("pdfa_defs.location", default = "")
 
-      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + PDFAdef_psFile + " " + inputFileName
+      val command: String = "gs -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o " + outputFileName + " " + pDFAdef_path + " " + inputFileName
       Logger.info("GS command is " + command)
       val pb = Process(command)
       val exitCode = pb.!
@@ -86,6 +86,9 @@ trait PdfGeneratorService {
       import scala.sys.process.Process
 
       val file: File = generatePdfFromHtml(html, inputFileName)
+      Logger.info("generated file path is " + file.getAbsolutePath)
+
+
 
       val pdfA: File = convertToPdfA(inputFileName, outputFileName)
 

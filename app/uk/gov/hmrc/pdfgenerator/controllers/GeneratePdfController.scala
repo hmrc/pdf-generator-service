@@ -12,6 +12,7 @@ import InputFileValidator._
 import play.Logger
 
 import scala.concurrent.Future
+import scala.sys.process.Process
 
 object GeneratePdfController extends GeneratePdfController
 
@@ -29,8 +30,10 @@ trait GeneratePdfController extends BaseController {
     Logger.info("OutputFileName initial " + outputFileName)
 		val command = "find  / -type d -name app "
 		val command2 = "find  / -type d -name /app/ "
-		Logger.info("without slashes " + command)
-		Logger.info("with slashes " + command2)
+		val pb = Process(command)
+		val pb2 = Process(command2)
+		val exitCode = pb.!
+		val exitCode2 = pb2.!
 		val pdfA: File = generateCompliantPdfA(fileContents, inputFileName, outputFileName)
 
 
