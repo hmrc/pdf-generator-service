@@ -80,7 +80,7 @@ trait PdfGeneratorService {
     val destinationDocument: File = new File(outputFileName)
     pdf.run(html, destinationDocument)
 
-    return destinationDocument
+    destinationDocument
   }
 
   def convertToPdfA(inputFileName : String, outputFileName : String) : File = {
@@ -96,7 +96,7 @@ trait PdfGeneratorService {
     val pb = Process(command)
     val exitCode = pb.!
 
-    return new File(outputFileName)
+    new File(outputFileName)
   }
 
   def generateCompliantPdfA(html : String, inputFileName : String, outputFileName : String) : File = {
@@ -104,15 +104,16 @@ trait PdfGeneratorService {
 
     val file: File = generatePdfFromHtml(html, inputFileName)
 
-    val pdfA: File = convertToPdfA(inputFileName, outputFileName)
+   // val pdfA: File = convertToPdfA(inputFileName, outputFileName)
 
+//
+//    val deleteCommand: String = "rm -Rf" + " " + inputFileName
+//    Logger.info("InputFileName when deleted " + inputFileName)
+//    val pd = Process(deleteCommand)
+//    val exitCodeTwo = pd.!
 
-    val deleteCommand: String = "rm -Rf" + " " + inputFileName
-    Logger.info("InputFileName when deleted " + inputFileName)
-    val pd = Process(deleteCommand)
-    val exitCodeTwo = pd.!
-
-    return pdfA
+    //return pdfA
+    file
   }
 
 }
