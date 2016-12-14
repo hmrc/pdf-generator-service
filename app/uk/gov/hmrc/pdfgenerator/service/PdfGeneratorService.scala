@@ -19,12 +19,13 @@ object PdfGeneratorService extends PdfGeneratorService
   */
 trait PdfGeneratorService {
 
-  private val GS_ALIAS = "gs"
-//  private val GS_ALIAS = "/app/bin/gs-920-linux_x86_64"
-  private val baseDir: String = new File(".").getCanonicalPath + "/"
-  //  val baseDir: String = "/app/" // will eventually become "/app/scratch/"
-  private val CONF_DIR = "/Users/work/Desktop/temp/"
-//  private val CONF_DIR = "/app/"
+//  private val GS_ALIAS = "gs"
+  private val GS_ALIAS = "/app/bin/gs-920-linux_x86_64"
+//  private val baseDir: String = "/Users/work/Desktop/temp/"
+//  private val baseDir: String = new File(".").getCanonicalPath + "/"
+  private val baseDir: String = "/app/" // will eventually become "/app/scratch/"
+//  private val CONF_DIR = "/Users/work/Desktop/temp/"
+  private val CONF_DIR = "/app/"
 
   private val pdfs_def = "PDFA_def.ps"
   private val PDFA_CONF = CONF_DIR + pdfs_def
@@ -44,28 +45,28 @@ trait PdfGeneratorService {
       Future.failed(throw new BadRequestException("OutputFileName must be provided"))
     }
 
-    //      val pdf = Pdf("/app/bin/wkhtmltopdf", new PdfConfig {
-    ////        orientation := Portrait
-    ////        pageSize := "A4"
-    ////        marginTop := "1in"
-    ////        marginBottom := "1in"
-    ////        marginLeft := "1in"
-    ////        marginRight := "1in"
-    ////        disableExternalLinks := true
-    ////        disableInternalLinks := true
-    ////      })
-    //
+          val pdf = Pdf("/app/bin/wkhtmltopdf", new PdfConfig {
+            orientation := Portrait
+            pageSize := "A4"
+            marginTop := "1in"
+            marginBottom := "1in"
+            marginLeft := "1in"
+            marginRight := "1in"
+            disableExternalLinks := true
+            disableInternalLinks := true
+          })
 
-    // Create a new Pdf converter with a custom configuration
-    // run `wkhtmltopdf --extended-help` for a full list of options
-    val pdf = Pdf(new PdfConfig {
-      orientation := Portrait
-      pageSize := "A4"
-      marginTop := "1in"
-      marginBottom := "1in"
-      marginLeft := "1in"
-      marginRight := "1in"
-    })
+
+//    // Create a new Pdf converter with a custom configuration
+//    // run `wkhtmltopdf --extended-help` for a full list of options
+//    val pdf = Pdf(new PdfConfig {
+//      orientation := Portrait
+//      pageSize := "A4"
+//      marginTop := "1in"
+//      marginBottom := "1in"
+//      marginLeft := "1in"
+//      marginRight := "1in"
+//    })
 
     val destinationDocument: File = new File(outputFileName)
     pdf.run(html, destinationDocument)
@@ -80,19 +81,21 @@ trait PdfGeneratorService {
     setUpConfigFile(adobeColorProfile, ICC_CONF)
 
     val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
-      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PDFA_CONF + "  " + baseDir + inputFileName
+      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PDFA_CONF + "  " + inputFileName
     val pb = Process(command)
     val exitCode = pb.!
 
-    return new File(baseDir + outputFileName)
+    return new File(outputFileName)
   }
 
   def generateCompliantPdfA(html : String, inputFileName : String, outputFileName : String) : File = {
     import scala.sys.process.Process
 
-    val file: File = generatePdfFromHtml(html, inputFileName)
+    //code will be refactored
 
-    val pdfA: File = convertToPdfA(inputFileName, outputFileName)
+    val file: File = generatePdfFromHtml(html, baseDir + inputFileName)
+
+    val pdfA: File = convertToPdfA(baseDir + inputFileName, baseDir + outputFileName)
 
     val deleteCommand: String = "rm -Rf" + " " + baseDir + inputFileName
     val pd = Process(deleteCommand)
