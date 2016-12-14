@@ -5,7 +5,7 @@ import java.io.{BufferedInputStream, BufferedOutputStream, FileOutputStream}
 /**
   * Created by peter on 14/12/2016.
   */
-class ResourceHelper {
+object ResourceHelper {
 
   def reader(filename: String): Array[Byte]  = {
     val bis = new BufferedInputStream(getClass.getResourceAsStream(filename))

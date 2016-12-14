@@ -109,20 +109,27 @@ trait PdfGeneratorService {
     if(new File(configPath).exists){
       return
     }
-    val file = new File(configPath)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(toSource(fileName).mkString)
-    bw.close()
+
+    val bytes = ResourceHelper.reader("/"+fileName)
+    ResourceHelper.writer(configPath, bytes)
+
+//    val file = new File(configPath)
+//    val bw = new BufferedWriter(new FileWriter(file))
+//
+//    val inputStream = scala.io.Source.fromInputStream(getClass.getResourceAsStream("/" + fileName))
+//
+//    bw.write(inputStream.mkString)
+//    bw.close()
   }
 
-  def toSource(fileName:String): scala.io.BufferedSource = {
-    import java.nio.charset.{Charset, CodingErrorAction}
-
-    val resource = getClass.getResourceAsStream("/" + fileName)
-
-    val decoder = Charset.forName("UTF-8").newDecoder()
-    decoder.onMalformedInput(CodingErrorAction.IGNORE)
-    scala.io.Source.fromInputStream(resource)(decoder)
-  }
+//  def toSource(fileName:String, encoding:String): scala.io.BufferedSource = {
+//    import java.nio.charset.{Charset, CodingErrorAction}
+//
+//    val resource = getClass.getResourceAsStream("/" + fileName)
+//
+//    val decoder = Charset.forName(encoding).newDecoder()
+//    decoder.onMalformedInput(CodingErrorAction.IGNORE)
+//    scala.io.Source.fromInputStream(resource)(decoder)
+//  }
 
 }
