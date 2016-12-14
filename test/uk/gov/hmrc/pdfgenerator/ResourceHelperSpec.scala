@@ -8,13 +8,13 @@ import uk.gov.hmrc.pdfgenerator.service.ResourceHelper
   */
 class ResourceHelperSpec extends WordSpec with MustMatchers {
 
-  val resourceHelper = new ResourceHelper()
+
 
 
   "A resoucer helper " should {
 
     "read a a file as a byte array and write is back out as a byte arry" in {
-      resourceHelper.writer("./testAdobeRGB1998.icc", resourceHelper.reader("/AdobeRGB1998.icc"))
+      ResourceHelper.writer("./testAdobeRGB1998.icc", ResourceHelper.reader("/AdobeRGB1998.icc"))
     }
   }
 
