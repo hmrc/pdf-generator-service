@@ -2,6 +2,7 @@ package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.{BufferedWriter, File, FileWriter}
 
+import play.api.Logger
 import uk.gov.hmrc.play.http.BadRequestException
 
 import scala.concurrent.Future
@@ -92,6 +93,9 @@ trait PdfGeneratorService {
     import scala.sys.process.Process
 
     //code will be refactored
+
+    Logger.trace(s"generateCompliantPdfA from ${html}")
+    Logger.info(s"generateCompliantPdfA inputFileName: ${inputFileName} outputFileName: ${outputFileName}")
 
     val file: File = generatePdfFromHtml(html, baseDir + inputFileName)
 
