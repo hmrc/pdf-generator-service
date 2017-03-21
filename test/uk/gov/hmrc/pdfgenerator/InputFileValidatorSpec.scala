@@ -29,26 +29,22 @@ object MultipartFormFixture {
   def completeMultipartFormData_noScriptTags: MultipartFormData[TemporaryFile] = MultipartFormData(
     dataParts = Map(),
     files = Seq(FilePart[TemporaryFile]("file", noScriptTagfile.getName, Some("text/html"), TemporaryFile(noScriptTagfile))),
-    badParts = Seq(),
-    missingFileParts = Seq())
+    badParts = Seq())
 
   def completeMultipartFormData_withScriptTags: MultipartFormData[TemporaryFile] = MultipartFormData(
     dataParts = Map(),
     files = Seq(FilePart[TemporaryFile]("file", scripTagfile.getName, Some("text/html"), TemporaryFile(scripTagfile))),
-    badParts = Seq(),
-    missingFileParts = Seq())
+    badParts = Seq())
 
   def dummyFileMultipartForm: MultipartFormData[TemporaryFile] = MultipartFormData(
     dataParts = Map(),
     files = Seq(FilePart[TemporaryFile]("file", dummyFile.getName, Some("text/html"), TemporaryFile(dummyFile))),
-    badParts = Seq(),
-    missingFileParts = Seq())
+    badParts = Seq())
 
   def emptyMultipartFormData_withScriptTags: MultipartFormData[TemporaryFile] = MultipartFormData(
     dataParts = Map(),
     files = Seq(),
-    badParts = Seq(),
-    missingFileParts = Seq())
+    badParts = Seq())
 
 }
 
