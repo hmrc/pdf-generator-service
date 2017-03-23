@@ -1,4 +1,4 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.pdfgenerator.controllers.MicroserviceHelloWorld.hello
-POST       /generate-pdfa      uk.gov.hmrc.pdfgenerator.controllers.GeneratePdfController.generatePdfA
+GET        /ping             uk.gov.hmrc.pdfgenerator.controllers.HeartBeat.ping
+POST       /generate      @uk.gov.hmrc.pdfgenerator.controllers.PdfGeneratorController.generate

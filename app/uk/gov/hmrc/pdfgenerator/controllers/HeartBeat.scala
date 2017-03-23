@@ -5,11 +5,11 @@ import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import play.api.mvc._
 import scala.concurrent.Future
 
-object MicroserviceHelloWorld extends MicroserviceHelloWorld
+object HeartBeat extends HeartBeat
 
-trait MicroserviceHelloWorld extends BaseController {
+trait HeartBeat extends BaseController {
 
-	def hello() = Action.async { implicit request =>
-		Future.successful(Ok("Hello world"))
+	def ping() = Action.async { implicit request =>
+		Future.successful(Ok("pong"))
 	}
 }

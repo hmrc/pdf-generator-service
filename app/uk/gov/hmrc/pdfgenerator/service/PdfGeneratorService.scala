@@ -1,139 +1,148 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.{BufferedWriter, File, FileWriter}
+import java.util.UUID
+import javax.inject.Inject
 
-import play.api.Logger
-import uk.gov.hmrc.play.http.BadRequestException
+import play.api.{Configuration, Logger}
 
-import scala.concurrent.Future
-
-
-object PdfGeneratorService extends PdfGeneratorService
+import scala.io._
 
 
-/**
-  * Created by habeeb on 10/10/2016.
-  *
-  * This class is responsible for generating a PDF from a given
-  * HTML page
-  *
-  */
-trait PdfGeneratorService {
+object PdfGeneratorService {
+  @Inject
+  val configuration: Configuration = null
+  def apply: PdfGeneratorService = new PdfGeneratorService(configuration)
+}
 
-//  private val GS_ALIAS = "gs"
-  private val GS_ALIAS = "/app/bin/gs-920-linux_x86_64"
-//  private val baseDir: String = "/Users/work/Desktop/temp/"
-//  private val baseDir: String = new File(".").getCanonicalPath + "/"
-  private val baseDir: String = "/app/" // will eventually become "/app/scratch/"
-//  private val CONF_DIR = "/Users/work/Desktop/temp/"
-  private val CONF_DIR = "/app/"
+class PdfGeneratorService @Inject()(configuration: Configuration) {
 
-  private val pdfs_def = "PDFA_def.ps"
-  private val PDFA_CONF = CONF_DIR + pdfs_def
-  private val adobeColorProfile = "AdobeRGB1998.icc"
-  private val ICC_CONF = CONF_DIR + adobeColorProfile
+  private val PROD_ROOT = "/app/"
+  private val CONFIG_KEY = "pdfGeneratorService."
 
-  def generatePdfFromHtml(html : String, outputFileName : String) : File = {
-    import java.io._
+  // From application.conf or environment specific
+  private val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
-    import io.github.cloudify.scala.spdf._
-
-    if(html == null || html.isEmpty){
-      Future.failed(throw new BadRequestException("Html must be provided"))
-    }
-
-    if(outputFileName == null || outputFileName.isEmpty){
-      Future.failed(throw new BadRequestException("OutputFileName must be provided"))
-    }
-
-          val pdf = Pdf("/app/bin/wkhtmltopdf", new PdfConfig {
-            orientation := Portrait
-            pageSize := "A4"
-            marginTop := "1in"
-            marginBottom := "1in"
-            marginLeft := "1in"
-            marginRight := "1in"
-            disableExternalLinks := true
-            disableInternalLinks := true
-          })
-
-
-//    // Create a new Pdf converter with a custom configuration
-//    // run `wkhtmltopdf --extended-help` for a full list of options
-//    val pdf = Pdf(new PdfConfig {
-//      orientation := Portrait
-//      pageSize := "A4"
-//      marginTop := "1in"
-//      marginBottom := "1in"
-//      marginLeft := "1in"
-//      marginRight := "1in"
-//    })
-
-    val destinationDocument: File = new File(outputFileName)
-    pdf.run(html, destinationDocument)
-
-    return destinationDocument
+  def getBaseDir: String = BASE_DIR_DEV_MODE match {
+    case true => new File(".").getCanonicalPath + "/"
+    case _ => PROD_ROOT
   }
 
-  def convertToPdfA(inputFileName : String, outputFileName : String) : File = {
+  private val GS_ALIAS: String  = configuration.getString(CONFIG_KEY + "gsAlias").getOrElse("/app/bin/gs-920-linux_x86_64")
+  private val BASE_DIR: String = configuration.getString(CONFIG_KEY + "baseDir").getOrElse(getBaseDir)
+  private val CONF_DIR: String  = configuration.getString(CONFIG_KEY + "confDir").getOrElse(getBaseDir)
+  private val WK_TO_HTML_EXECUABLE = configuration.getString(CONFIG_KEY + "wkHtmlToPdfExecutable").getOrElse("/app/bin/wkhtmltopdf")
+  private val BARE_PS_DEF_FILE: String  = configuration.getString(CONFIG_KEY + "psDef").getOrElse("PDFA_def.ps")
+  private val ADOBE_COLOR_PROFILE: String  = configuration.getString(CONFIG_KEY + "adobeColorProfile").getOrElse("AdobeRGB1998.icc")
+
+  private val PS_DEF_FILE_FULL_PATH: String  = CONF_DIR + BARE_PS_DEF_FILE
+  private val ADOBE_COLOR_PROFILE_FULL_PATH: String  = CONF_DIR + ADOBE_COLOR_PROFILE
+
+
+  def logConfig(): Unit = {
+    Logger.debug(s"\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
+      s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUABLE} " +
+      s"\nPS_DEF: ${BARE_PS_DEF_FILE} \nADOBE_COLOR_PROFILE: ${ADOBE_COLOR_PROFILE} \nPDFA_CONF: ${PS_DEF_FILE_FULL_PATH} \nICC_CONF: " +
+      s"${ADOBE_COLOR_PROFILE_FULL_PATH}")
+  }
+
+
+  private def generatePdfFromHtml(html: String, inputFileName: String): File = {
+    import java.io._
+    import io.github.cloudify.scala.spdf._
+
+
+    val pdf: Pdf = Pdf(WK_TO_HTML_EXECUABLE, new PdfConfig {
+      orientation := Portrait
+      pageSize := "A4"
+      marginTop := "1in"
+      marginBottom := "1in"
+      marginLeft := "1in"
+      marginRight := "1in"
+      disableExternalLinks := true
+      disableInternalLinks := true
+    })
+
+    val outputFile: File = new File(inputFileName)
+    outputFile.deleteOnExit() // only when the JVM exits added for safety
+    pdf.run(html, outputFile)
+
+    outputFile
+  }
+
+
+  def setUpPsDefFile(pdDefFileBare: String, pdDefFileFullPath: String) = {
+
+    def replace(line: String): String = line.replace("$COLOUR_PROFILE$", ADOBE_COLOR_PROFILE_FULL_PATH)
+
+    if(!new File(pdDefFileFullPath).exists) {
+      Logger.debug(s"Filtering pdf ${BASE_DIR}conf/${pdDefFileBare}")
+      val source = Source .fromFile(BASE_DIR + "conf/" + pdDefFileBare)
+      val lines = source.getLines
+      val result = lines.map(line => replace(line))
+
+      val file = new File(pdDefFileFullPath)
+      val bw = new BufferedWriter(new FileWriter(file))
+
+      bw.write(result.mkString("\n"))
+      bw.close()
+      source.close()
+
+    } else {
+      setUpConfigFile(pdDefFileBare, pdDefFileFullPath)
+    }
+  }
+
+
+  private def convertToPdfA(inputFileName: String, outputFileName: String): File = {
     import scala.sys.process.Process
 
-    setUpConfigFile(pdfs_def, PDFA_CONF)
-    setUpConfigFile(adobeColorProfile, ICC_CONF)
+    setUpPsDefFile(BARE_PS_DEF_FILE, PS_DEF_FILE_FULL_PATH)
+    setUpConfigFile(ADOBE_COLOR_PROFILE, ADOBE_COLOR_PROFILE_FULL_PATH)
 
     val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
-      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PDFA_CONF + "  " + inputFileName
+      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PS_DEF_FILE_FULL_PATH + "  " + inputFileName
+
+    Logger.info(s"Running: ${command}")
     val pb = Process(command)
     val exitCode = pb.!
 
-    return new File(outputFileName)
+    val file = new File(outputFileName)
+    file.deleteOnExit()
+    file
   }
 
-  def generateCompliantPdfA(html : String, inputFileName : String, outputFileName : String) : File = {
-    import scala.sys.process.Process
 
-    //code will be refactored
 
+  def generateCompliantPdfA(html: String): File = {
+
+    logConfig()
+
+    val inputFileName: String = UUID.randomUUID.toString + ".pdf"
+    val outputFileName: String = UUID.randomUUID.toString + ".pdf"
     Logger.trace(s"generateCompliantPdfA from ${html}")
     Logger.info(s"generateCompliantPdfA inputFileName: ${inputFileName} outputFileName: ${outputFileName}")
 
-    val file: File = generatePdfFromHtml(html, baseDir + inputFileName)
-
-    val pdfA: File = convertToPdfA(baseDir + inputFileName, baseDir + outputFileName)
-
-    val deleteCommand: String = "rm -Rf" + " " + baseDir + inputFileName
-    val pd = Process(deleteCommand)
-    val exitCodeTwo = pd.!
-
-    return pdfA
-  }
-
-  def setUpConfigFile(fileName:String, configPath:String) : Unit = {
-
-    if(new File(configPath).exists){
-      return
+    def cleanUpInputFile = {
+      val inputFile = new File(BASE_DIR + inputFileName)
+      if (inputFile.exists()) {
+        inputFile.delete()
+      }
     }
 
-    val bytes = ResourceHelper.reader("/"+fileName)
-    ResourceHelper.writer(configPath, bytes)
-
-//    val file = new File(configPath)
-//    val bw = new BufferedWriter(new FileWriter(file))
-//
-//    val inputStream = scala.io.Source.fromInputStream(getClass.getResourceAsStream("/" + fileName))
-//
-//    bw.write(inputStream.mkString)
-//    bw.close()
+    try {
+      generatePdfFromHtml(html, BASE_DIR + inputFileName)
+      convertToPdfA(BASE_DIR + inputFileName, BASE_DIR + outputFileName)
+    } finally {
+      cleanUpInputFile
+    }
   }
 
-//  def toSource(fileName:String, encoding:String): scala.io.BufferedSource = {
-//    import java.nio.charset.{Charset, CodingErrorAction}
-//
-//    val resource = getClass.getResourceAsStream("/" + fileName)
-//
-//    val decoder = Charset.forName(encoding).newDecoder()
-//    decoder.onMalformedInput(CodingErrorAction.IGNORE)
-//    scala.io.Source.fromInputStream(resource)(decoder)
-//  }
+  def setUpConfigFile(fileName: String, configPath: String): Unit = {
+    if (!new File(configPath).exists) {
+      val bytes = ResourceHelper.reader("/" + fileName)
+      ResourceHelper.writer(configPath, bytes)
+    }
+  }
 
 }
