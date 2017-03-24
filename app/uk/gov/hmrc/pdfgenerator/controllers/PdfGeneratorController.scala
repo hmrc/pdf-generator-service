@@ -3,17 +3,19 @@ package uk.gov.hmrc.pdfgenerator.controllers
 import java.io.File
 import javax.inject.Inject
 
+import scala.util.Failure
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.Future
+import scala.util.Success
 
 object PdfGeneratorController {
   @Inject()
   val configuration: Configuration = null
-  def apply: PdfGeneratorController = new PdfGeneratorController(new PdfGeneratorService(configuration))
+  def apply: PdfGeneratorController = new PdfGeneratorController(PdfGeneratorService.apply)
 }
 
 
@@ -31,8 +33,10 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
         Future.successful(BadRequest(errors))
       },
       html => {
-        val pdfA: File = pdfGeneratorService.generateCompliantPdfA(html) // todo make this an Option
-        Future.successful(Ok.sendFile(pdfA, inline = false, onClose = () => pdfA.delete()))
+        pdfGeneratorService.generateCompliantPdfA(html) match {
+          case Success(file) => Future.successful(Ok.sendFile(file, inline = false, onClose = () => file.delete()))
+          case Failure(e) => Future.successful(BadRequest(e.getMessage))
+        }
       }
     )
   }
