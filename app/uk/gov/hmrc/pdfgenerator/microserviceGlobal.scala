@@ -24,6 +24,7 @@ import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import net.ceedubs.ficus.Ficus._
+import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 
 
@@ -52,6 +53,10 @@ object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilte
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode {
   override val auditConnector = MicroserviceAuditConnector
+
+  override def onStart(app: Application): Unit = {
+    super.onStart(app)
+  }
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
 
