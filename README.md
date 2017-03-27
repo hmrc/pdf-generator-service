@@ -9,7 +9,7 @@ POST /generate-pdf
 
 All requests use the HTTP `POST` method
 
-### PDF Generator Service (external facing API - `/generate-pdf`)
+### PDF Generator Service (external facing API - `/generate`)
 
 #### Functionality
 
@@ -26,13 +26,19 @@ All requests use the HTTP `POST` method
 
 ## Run the application locally
 
+*Install wktohtml https://wkhtmltopdf.org/downloads.html
+*Install Ghostscript https://ghostscript.com/
+*Check alias for ghostscript is ```gs
+*Check parameters in application.conf after "PdfGenerator Service config - use these values for local running only"
+
+
 To run the application execute
 
 ```
 sbt ~run 9000
 ```
 
-The endpoints can then be accessed with the base url http://localhost:9000/pdf-generator
+The endpoints can then be accessed with the base url http://localhost:9000/pdf-generator-service/pdf-generator/generate
 
 
 ## License
