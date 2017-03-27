@@ -1,14 +1,12 @@
 package uk.gov.hmrc.pdfgenerator.service
 
-import java.io.{BufferedWriter, File, FileWriter, IOException}
+import java.io.{File, IOException}
 import java.util.UUID
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import play.api.{Configuration, Logger}
-import javax.inject.Singleton
 
-import scala.io.Source
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 
 object PdfGeneratorService {
@@ -59,7 +57,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   def init(): Unit = {
     Logger.info("Initialising PdfGeneratorService")
-    resourceHelper.setUpPsDefFile(BARE_PS_DEF_FILE, PS_DEF_FILE_FULL_PATH, BASE_DIR,
+    resourceHelper.setupExecutableSupportFiles(BARE_PS_DEF_FILE, PS_DEF_FILE_FULL_PATH, BASE_DIR,
       ADOBE_COLOR_PROFILE, ADOBE_COLOR_PROFILE_FULL_PATH)
   }
 
@@ -89,6 +87,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def generatePdfFromHtml(html: String, inputFileName: String): Try[File] = {
     import java.io._
+
     import io.github.cloudify.scala.spdf._
 
     Try {
@@ -123,7 +122,6 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
-    import scala.sys.process.Process
 
     val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
       "-sDEVICE=pdfwrite -o " + outputFileName + " " + PS_DEF_FILE_FULL_PATH + "  " + inputFileName

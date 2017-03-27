@@ -8,12 +8,17 @@ import play.api.Configuration
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
-import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
+import uk.gov.hmrc.pdfgenerator.service.{PdfGeneratorService, ResourceHelper}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+
+import uk.gov.hmrc.pdfgenerator.resources._
+
+import scala.util.Try
+
 
 class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with ScalaFutures  {
 
-  val configuration = new Configuration(ConfigFactory.load("applciation.conf"))
+
 
   "POST /generate" should {
     "create pdf from a String of html sent in as a form element" in {
@@ -47,17 +52,23 @@ class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with 
 
 }
 
-class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration) {
 
-  override def generateCompliantPdfA(html: String): File = {
-    val testPdfFile = "PDFAcompliant.pdf"
 
-    val file = new File(testPdfFile)
+class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration, MockResourceHelper) {
 
-    if(!file.exists()) {
-      throw new IllegalStateException(s"Can't find pdf for MockPdfGeneratorService ${testPdfFile}" )
+  override def generateCompliantPdfA(html: String): Try[File] = {
+
+    Try {
+      val testPdfFile = "PDFAcompliant.pdf"
+
+      val file = new File(testPdfFile)
+
+      if (!file.exists()) {
+        throw new IllegalStateException(s"Can't find pdf for MockPdfGeneratorService ${testPdfFile}")
+      }
+      file
     }
-    file
   }
+
 
 }
