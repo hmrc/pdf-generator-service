@@ -3,10 +3,8 @@ package uk.gov.hmrc.pdfgenerator.service
 import java.io.{File, IOException}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-
 import play.api.{Configuration, Logger}
-
-import scala.util.Try
+import scala.util.{Success, Try, Failure}
 
 
 object PdfGeneratorService {
@@ -24,27 +22,42 @@ trait InitHook {
 @Singleton
 class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper: ResourceHelper) extends InitHook {
 
-
-  private val PROD_ROOT = "/app/"
-  private val CONFIG_KEY = "pdfGeneratorService."
+  val EMPTY_INDICATOR = "EMPTY_FOR_PROD_DEFAULT"
+  val PROD_ROOT = "/app/"
+  val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
-  private val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
+  val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
     case true => new File(".").getCanonicalPath + "/"
     case _ => PROD_ROOT
   }
 
-  private val GS_ALIAS: String = configuration.getString(CONFIG_KEY + "gsAlias").getOrElse("/app/bin/gs-920-linux_x86_64")
-  private val BASE_DIR: String = configuration.getString(CONFIG_KEY + "baseDir").getOrElse(getBaseDir)
-  private val CONF_DIR: String = configuration.getString(CONFIG_KEY + "confDir").getOrElse(getBaseDir)
-  private val WK_TO_HTML_EXECUABLE = configuration.getString(CONFIG_KEY + "wkHtmlToPdfExecutable").getOrElse("/app/bin/wkhtmltopdf")
-  private val BARE_PS_DEF_FILE: String = configuration.getString(CONFIG_KEY + "psDef").getOrElse("PDFA_def.ps")
-  private val ADOBE_COLOR_PROFILE: String = configuration.getString(CONFIG_KEY + "adobeColorProfile").getOrElse("AdobeRGB1998.icc")
+  private def default(configuration: Configuration, key: String, productionDefault: String): String = {
+    Try[String] {
+      val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
+      value match {
+        case EMPTY_INDICATOR => productionDefault
+        case _: String => value
+      }
+    } match {
+      case Success(value) => value
+      case Failure(_) => {
+        Logger.error(s"Failed to find a value for ${key} defaulting to ${productionDefault}")
+        productionDefault
+      }
+    }
+  }
 
-  private val PS_DEF_FILE_FULL_PATH: String = CONF_DIR + BARE_PS_DEF_FILE
-  private val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
+  val GS_ALIAS: String = default(configuration, "gsAlias", "/app/bin/gs-920-linux_x86_64")
+  val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
+  val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
+  val WK_TO_HTML_EXECUABLE = default(configuration, "wkHtmlToPdfExecutable", "/app/bin/wkhtmltopdf")
+  val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
+  val ADOBE_COLOR_PROFILE: String = default(configuration, "adobeColorProfile", "AdobeRGB1998.icc")
+  val PS_DEF_FILE_FULL_PATH: String = CONF_DIR + BARE_PS_DEF_FILE
+  val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
 
 
   private def logConfig(): Unit = {
