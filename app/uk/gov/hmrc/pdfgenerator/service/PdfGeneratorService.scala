@@ -36,12 +36,20 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     case _ => PROD_ROOT
   }
 
-  private val GS_ALIAS: String = configuration.getString(CONFIG_KEY + "gsAlias").getOrElse("/app/bin/gs-920-linux_x86_64")
-  private val BASE_DIR: String = configuration.getString(CONFIG_KEY + "baseDir").getOrElse(getBaseDir)
-  private val CONF_DIR: String = configuration.getString(CONFIG_KEY + "confDir").getOrElse(getBaseDir)
-  private val WK_TO_HTML_EXECUABLE = configuration.getString(CONFIG_KEY + "wkHtmlToPdfExecutable").getOrElse("/app/bin/wkhtmltopdf")
-  private val BARE_PS_DEF_FILE: String = configuration.getString(CONFIG_KEY + "psDef").getOrElse("PDFA_def.ps")
-  private val ADOBE_COLOR_PROFILE: String = configuration.getString(CONFIG_KEY + "adobeColorProfile").getOrElse("AdobeRGB1998.icc")
+  private def default(option: Option[String], defaultValue: String): String = {
+    option.getOrElse(defaultValue) match {
+      case "BAD" => defaultValue
+      case _: String => option.getOrElse(defaultValue)
+    }
+  }
+
+
+  private val GS_ALIAS: String = default(configuration.getString(CONFIG_KEY + "gsAlias"), "/app/bin/gs-920-linux_x86_64")
+  private val BASE_DIR: String = default(configuration.getString(CONFIG_KEY + "baseDir"), getBaseDir)
+  private val CONF_DIR: String = default(configuration.getString(CONFIG_KEY + "confDir"), getBaseDir)
+  private val WK_TO_HTML_EXECUABLE = default(configuration.getString(CONFIG_KEY + "wkHtmlToPdfExecutable"), "/app/bin/wkhtmltopdf")
+  private val BARE_PS_DEF_FILE: String = default(configuration.getString(CONFIG_KEY + "psDef"), "PDFA_def.ps")
+  private val ADOBE_COLOR_PROFILE: String = default(configuration.getString(CONFIG_KEY + "adobeColorProfile"), "AdobeRGB1998.icc")
 
   private val PS_DEF_FILE_FULL_PATH: String = CONF_DIR + BARE_PS_DEF_FILE
   private val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
