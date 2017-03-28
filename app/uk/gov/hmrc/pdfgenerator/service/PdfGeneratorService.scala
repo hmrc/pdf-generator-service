@@ -3,10 +3,8 @@ package uk.gov.hmrc.pdfgenerator.service
 import java.io.{File, IOException}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-
 import play.api.{Configuration, Logger}
-
-import scala.util.Try
+import scala.util.{Success, Try, Failure}
 
 
 object PdfGeneratorService {
@@ -24,7 +22,6 @@ trait InitHook {
 @Singleton
 class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper: ResourceHelper) extends InitHook {
 
-
   private val PROD_ROOT = "/app/"
   private val CONFIG_KEY = "pdfGeneratorService."
 
@@ -36,20 +33,29 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     case _ => PROD_ROOT
   }
 
-  private def default(option: Option[String], defaultValue: String): String = {
-    option.getOrElse(defaultValue) match {
-      case "BAD" => defaultValue
-      case _: String => option.getOrElse(defaultValue)
+  private def default(configuration: Configuration, key: String, productionDefault: String): String = {
+    Try[String] {
+      val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
+      value match {
+        case "BAD" => productionDefault
+        case _: String => value
+      }
+    } match {
+      case Success(value) => value
+      case Failure(_) => {
+        Logger.error(s"Failed to find a value for ${key} defaulting to ${productionDefault}")
+        productionDefault
+      }
     }
   }
 
 
-  private val GS_ALIAS: String = default(configuration.getString(CONFIG_KEY + "gsAlias"), "/app/bin/gs-920-linux_x86_64")
-  private val BASE_DIR: String = default(configuration.getString(CONFIG_KEY + "baseDir"), getBaseDir)
-  private val CONF_DIR: String = default(configuration.getString(CONFIG_KEY + "confDir"), getBaseDir)
-  private val WK_TO_HTML_EXECUABLE = default(configuration.getString(CONFIG_KEY + "wkHtmlToPdfExecutable"), "/app/bin/wkhtmltopdf")
-  private val BARE_PS_DEF_FILE: String = default(configuration.getString(CONFIG_KEY + "psDef"), "PDFA_def.ps")
-  private val ADOBE_COLOR_PROFILE: String = default(configuration.getString(CONFIG_KEY + "adobeColorProfile"), "AdobeRGB1998.icc")
+  private val GS_ALIAS: String = default(configuration, "gsAlias", "/app/bin/gs-920-linux_x86_64")
+  private val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
+  private val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
+  private val WK_TO_HTML_EXECUABLE = default(configuration, "wkHtmlToPdfExecutable", "/app/bin/wkhtmltopdf")
+  private val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
+  private val ADOBE_COLOR_PROFILE: String = default(configuration, "adobeColorProfile", "AdobeRGB1998.icc")
 
   private val PS_DEF_FILE_FULL_PATH: String = CONF_DIR + BARE_PS_DEF_FILE
   private val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
