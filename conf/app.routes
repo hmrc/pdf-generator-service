@@ -1,4 +1,3 @@
 # microservice specific routes
 
-GET        /ping             uk.gov.hmrc.pdfgenerator.controllers.HeartBeat.ping
 POST       /generate      @uk.gov.hmrc.pdfgenerator.controllers.PdfGeneratorController.generate
