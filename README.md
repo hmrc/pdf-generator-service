@@ -3,11 +3,11 @@
 
 
 ## Endpoint URLs
-POST /generate-pdf
+POST /generate-pdf 
 
 ## Service Definitions
 
-All requests use the HTTP `POST` method
+All requests use the HTTP `POST` method  
 
 ### PDF Generator Service (external facing API - `/generate`)
 
