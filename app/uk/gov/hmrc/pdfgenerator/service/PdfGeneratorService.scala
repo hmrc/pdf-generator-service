@@ -3,8 +3,11 @@ package uk.gov.hmrc.pdfgenerator.service
 import java.io.{File, IOException}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
+
 import play.api.{Configuration, Logger}
-import scala.util.{Success, Try, Failure}
+import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
+
+import scala.util.{Failure, Success, Try}
 
 
 object PdfGeneratorService {
@@ -61,15 +64,17 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
 
   private def logConfig(): Unit = {
+
     Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
       s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUABLE} " +
       s"\nPS_DEF: ${BARE_PS_DEF_FILE} \nADOBE_COLOR_PROFILE: ${ADOBE_COLOR_PROFILE} \nPDFA_CONF: ${PS_DEF_FILE_FULL_PATH} \nICC_CONF: " +
-      s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n")
+      s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n Diskspace: ${PdfGeneratorMetric.guage.getValue}Mb")
   }
 
 
   def init(): Unit = {
     Logger.info("Initialising PdfGeneratorService")
+
     resourceHelper.setupExecutableSupportFiles(BARE_PS_DEF_FILE, PS_DEF_FILE_FULL_PATH, BASE_DIR,
       ADOBE_COLOR_PROFILE, ADOBE_COLOR_PROFILE_FULL_PATH)
   }
