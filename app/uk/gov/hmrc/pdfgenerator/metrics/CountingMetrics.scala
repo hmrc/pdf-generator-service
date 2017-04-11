@@ -103,7 +103,10 @@ object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service"
 
     override def getValue: Int = {
       try {
-        Math.toIntExact(measureFile.getFreeSpace / ONE_MILLION)
+
+        val freeSpace = Math.toIntExact(measureFile.getFreeSpace / ONE_MILLION)
+        Logger.debug(s"Getting free diskspace ${freeSpace}Mb")
+        freeSpace
       } catch {
         case e => {
           Logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}" )
