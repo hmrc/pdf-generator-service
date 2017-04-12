@@ -6,6 +6,7 @@ import javax.inject.Inject
 import scala.util.Failure
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -25,6 +26,9 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
   def generate = Action.async { implicit request =>
 
     Logger.debug("******* Generating PDF ***********")
+
+    val start = PdfGeneratorMetric.startTimer()
+
     val htmlForm = createForm()
 
     htmlForm.bindFromRequest.fold(
@@ -34,8 +38,16 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
       },
       html => {
         pdfGeneratorService.generateCompliantPdfA(html) match {
-          case Success(file) => Future.successful(Ok.sendFile(file, inline = false, onClose = () => file.delete()))
-          case Failure(e) => Future.successful(BadRequest(e.getMessage))
+          case Success(file) => {
+            PdfGeneratorMetric.successCount()
+            PdfGeneratorMetric.endTimer(start)
+            Future.successful(Ok.sendFile(file, inline = false, onClose = () => file.delete()))
+          }
+          case Failure(e) => {
+            PdfGeneratorMetric.failureCount()
+            PdfGeneratorMetric.endTimer(start)
+            Future.successful(BadRequest(e.getMessage))
+          }
         }
       }
     )
