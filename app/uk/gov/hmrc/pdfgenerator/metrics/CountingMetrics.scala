@@ -83,16 +83,22 @@ sealed abstract class BasePdfGeneratorMetric(name : String) extends PDFMetrics {
 
   def count() = metrics.defaultRegistry.counter(s"$prefix-count").inc()
 
+  def successCount() = metrics.defaultRegistry.counter(s"$prefix-success-count").inc()
 
+  def failureCount() = metrics.defaultRegistry.counter(s"$prefix-failure-count").inc()
 }
+
+
 
 object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service") {
 
 
-  lazy val guage = new DiskSpaceGuage()
+  lazy val gauge = new DiskSpaceGuage()
 
-  metrics.defaultRegistry.register[DiskSpaceGuage](s"${prefix}-free-disk-space-guage",
-    guage)
+  metrics.defaultRegistry.register[DiskSpaceGuage](s"${prefix}-free-disk-space-gauge",
+    gauge)
+
+
 
 
   class DiskSpaceGuage() extends Gauge[Int] {

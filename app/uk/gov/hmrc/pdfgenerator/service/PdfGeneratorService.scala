@@ -68,7 +68,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
       s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUABLE} " +
       s"\nPS_DEF: ${BARE_PS_DEF_FILE} \nADOBE_COLOR_PROFILE: ${ADOBE_COLOR_PROFILE} \nPDFA_CONF: ${PS_DEF_FILE_FULL_PATH} \nICC_CONF: " +
-      s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n Diskspace: ${PdfGeneratorMetric.guage.getValue}Mb")
+      s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n Diskspace: ${PdfGeneratorMetric.gauge.getValue}Mb")
   }
 
 
