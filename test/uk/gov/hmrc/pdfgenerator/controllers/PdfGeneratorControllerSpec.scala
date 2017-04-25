@@ -10,6 +10,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import uk.gov.hmrc.pdfgenerator.service.{PdfGeneratorService, ResourceHelper}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import com.kenshoo.play.metrics.PlayModule
 
 import uk.gov.hmrc.pdfgenerator.resources._
 
@@ -17,6 +18,8 @@ import scala.util.Try
 
 
 class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with ScalaFutures  {
+
+  override def bindModules = Seq(new PlayModule)
 
 
 
