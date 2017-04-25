@@ -5,7 +5,7 @@
 ## Endpoint URLs
 POST /generate-pdf 
 
-## Service Definitions   
+## Service Definitions    
 
 All requests use the HTTP `POST` method  
 
