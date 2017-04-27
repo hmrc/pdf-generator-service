@@ -1,36 +1,34 @@
-
 # generate-pdf
 
-
 ## Endpoint URLs
-POST /generate-pdf 
+
+POST /pdf-generator-service/pdf-generator/generate
 
 ## Service Definitions    
 
 All requests use the HTTP `POST` method  
 
-### PDF Generator Service (external facing API - `/generate`)
+### PDF Generator Service
 
 #### Functionality
 
-	*Generates a PDF based on the submitted html file
-	*Generated PDF must be PDF/A 1 or PDF/A 2 compliant
-	*Generated PDF must match the HTML page from which it was generated
+	* Generates a PDF based on the submitted html
+	* Generated PDF must be PDF/A 1 or PDF/A 2 compliant
+	* Generated PDF must match the HTML page from which it was generated
 
 ## Request
-	*Body (Multipart Form): A single html file. 
+	* html-www-urlencoded-form with a single field 'html' that contains the html to be converted
 
 ## Response
-	*HTTP 200 OK with a generated and downloadable PDF
-	*HTTP 400 Bad Request for invalid/error scenarios
+	* HTTP 200 OK with a generated and downloadable PDF
+	* HTTP 400 Bad Request for invalid/error scenarios
 
 ## Run the application locally
 
-*Install wktohtml https://wkhtmltopdf.org/downloads.html
-*Install Ghostscript https://ghostscript.com/
-*Check alias for ghostscript is ```gs
-*Check parameters in application.conf after "PdfGenerator Service config - use these values for local running only"
-
+* Install wktohtml https://wkhtmltopdf.org/downloads.html version 0.12.3
+* Install Ghostscript https://ghostscript.com/
+* Check alias for ghostscript is ```gs
+* Check parameters in application.conf after "PdfGenerator Service config - use these values for local running only"
 
 To run the application execute
 
