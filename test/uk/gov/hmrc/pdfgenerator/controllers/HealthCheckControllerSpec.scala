@@ -45,7 +45,7 @@ class HealthCheckControllerSpec extends UnitSpec with WithFakeApplication with S
     }
   }
 
-  def badTry[Try[File]] = Try {
+  def badTry = Try {
     throw new IOException("Mocking something going wrong")
   }
 

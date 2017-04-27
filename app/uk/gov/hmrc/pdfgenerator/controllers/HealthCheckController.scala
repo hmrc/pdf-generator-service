@@ -10,13 +10,6 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-
-object HealthCheckController {
-  @Inject()
-  val configuration: Configuration = null
-  def apply: HealthCheckController = new HealthCheckController(PdfGeneratorService.apply)
-}
-
 class HealthCheckController @Inject()(val pdfGeneratorService: PdfGeneratorService) extends BaseController {
 
   def health = Action.async { implicit request =>
