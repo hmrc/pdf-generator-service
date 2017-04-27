@@ -21,8 +21,6 @@ class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with 
 
   override def bindModules = Seq(new PlayModule)
 
-
-
   "POST /generate" should {
     "create pdf from a String of html sent in as a form element" in {
       val pdfGeneratorController = new PdfGeneratorController(new MockPdfGeneratorService(configuration))
