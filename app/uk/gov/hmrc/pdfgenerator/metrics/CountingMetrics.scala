@@ -56,6 +56,22 @@ sealed protected trait Timer {
   }
 }
 
+sealed protected trait HealthCheckTimer {
+  this: MicroserviceMetrics =>
+
+  val prefix : String
+
+  private def time(diff: Long, unit: TimeUnit) =
+    metrics.defaultRegistry.timer(s"$prefix-health-check-timer").update(diff, unit)
+
+  def startHealthCheckTimer() : Long = System.currentTimeMillis()
+
+  def endHealthCheckTimer(start: Long) = {
+    val end = System.currentTimeMillis() - start
+    time(end, TimeUnit.MILLISECONDS)
+  }
+}
+
 sealed protected trait Connector {
   this: MicroserviceMetrics =>
 
@@ -64,7 +80,7 @@ sealed protected trait Connector {
   def status(code: Int) : Unit = metrics.defaultRegistry.counter(s"$prefix-connector-status-$code").inc()
 }
 
-sealed trait PDFMetrics extends MicroserviceMetrics with Timer with Connector {
+sealed trait PDFMetrics extends MicroserviceMetrics with Timer with Connector with HealthCheckTimer {
   Logger.info(s"[${super.getClass}][constructor] Initialising metrics interface")
 
   val prefix : String
