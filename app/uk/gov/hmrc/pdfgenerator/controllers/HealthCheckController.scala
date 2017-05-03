@@ -23,7 +23,8 @@ class HealthCheckController @Inject()(val pdfGeneratorService: PdfGeneratorServi
         Future.successful(Ok)
       }
       case Failure(e) => {
-        Logger.error("Failed HealthCheckController", e)
+        PdfGeneratorMetric.endHealthCheckTimer(timer)
+        Logger.error("Pdf Service Failed HealthCheck", e)
         Future.successful(InternalServerError)
       }
     }
