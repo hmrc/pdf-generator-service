@@ -1,5 +1,10 @@
 # generate-pdf
 
+## Performance issues with PNG image files
+
+* GhostScript is used to convert PDF to PDF/A format but but has a bug that results in slow conversion, poor rendering and large resulting files.
+* using gif format files instead of png avoids this issue
+
 ## Endpoint URLs
 
 POST /pdf-generator-service/pdf-generator/generate
