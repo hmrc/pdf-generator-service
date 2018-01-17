@@ -5,6 +5,8 @@
 * GhostScript is used to convert PDF to PDF/A format but but has a bug that results in slow conversion, poor rendering and large resulting files.
 * using gif format files instead of png avoids this issue
 
+## Using the Service
+Please read this [page](https://confluence.tools.tax.service.gov.uk/display/OFFPAY/Using+PDF+Generator) if you would like to consume this service on MDTP
 ## Endpoint URLs
 
 POST /pdf-generator-service/pdf-generator/generate
