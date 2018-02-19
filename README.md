@@ -45,6 +45,29 @@ sbt ~run 9852
 
 The endpoints can then be accessed with the base url http://localhost:9000/pdf-generator-service/pdf-generator/generate
 
+## Tips on installing application on Ubuntu
+
+This command will install ghostscript:
+```
+sudo apt-get install ghostscript
+```
+This command will install wkhtmltopdf:
+```
+sudo apt-get install wkhtmltopdf
+```
+We then need to add this symbolic link so that the service finds the program:
+```
+sudo ln -s /usr/bin/wkhtmltopdf /usr/local/bin
+```
+If you need to check the logs of the generator service, you may find it useful to use this command to remove the graphite warnings:
+
+```
+sm --start PDF_GENERATOR_SERVICE --appendArgs '{"PDF_GENERATOR_SERVICE":["-Dmicroservice.metrics.graphite.enabled=false"]}' -f
+```
+This command will bring up the logs of the pdf-generator-service:
+```
+sm --logs PDF_GENERATOR_SERVICE
+```
 
 ## License
 
