@@ -3,5 +3,5 @@ digital-service: PDF Generator
 leakDetectionExemptions:
  - ruleId: 'tax_service_gov_uk'
    filePaths:
-      - '/conf/application.conf'
+      - '/test/resources/test-application.conf'
 
