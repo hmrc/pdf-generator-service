@@ -3,7 +3,8 @@ package uk.gov.hmrc.pdfgenerator.service
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.Configuration
-import uk.gov.hmrc.pdfgenerator.resources._
+import uk.gov.hmrc.play.test.WithFakeApplication
+
 
 
 object PdfGeneratorServiceIntegrationFixture {
@@ -11,9 +12,11 @@ object PdfGeneratorServiceIntegrationFixture {
 }
 
 
-class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers{
+class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with WithFakeApplication{
 
-  val pdfGeneratorService = new PdfGeneratorService(configuration, MockResourceHelper)
+
+  val testConfig = new Configuration(ConfigFactory.load())
+  val pdfGeneratorService = new PdfGeneratorService(testConfig, ResourceHelper.apply)
 
   "A PdfGeneratorService" should {
     "generate a pdf" in {

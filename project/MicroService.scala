@@ -8,22 +8,22 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 trait MicroService {
 
   import uk.gov.hmrc._
-  import DefaultBuildSettings._
+  import DefaultBuildSettings.{defaultSettings, scalaSettings, addTestReportOption}
   import TestPhases._
   import uk.gov.hmrc.SbtAutoBuildPlugin
   import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
   import uk.gov.hmrc.versioning.SbtGitVersioning
-  import play.sbt.routes.RoutesKeys.routesGenerator
+  import _root_.play.sbt.routes.RoutesKeys.routesGenerator
 
   val appName: String
 
-  lazy val appDependencies : Seq[ModuleID] = ???
+  lazy val appDependencies : Seq[ModuleID] = List()
   lazy val plugins : Seq[Plugins] = Seq.empty
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
 
   lazy val microservice = Project(appName, file("."))
-    .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
+    .enablePlugins(Seq(_root_.play.sbt.PlayScala,SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
     .settings(playSettings : _*)
     .settings(scalaSettings: _*)
     .settings(publishingSettings: _*)
