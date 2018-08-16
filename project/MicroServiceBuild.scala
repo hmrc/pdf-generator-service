@@ -41,7 +41,7 @@ private object AppDependencies {
 
   trait TestDependencies {
     lazy val scope: String = "test"
-    lazy val test : Seq[ModuleID] = ???
+    lazy val test : Seq[ModuleID] = List()
   }
 
   object Test {
