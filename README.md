@@ -67,6 +67,6 @@ This command will bring up the logs of the pdf-generator-service:
 sm --logs PDF_GENERATOR_SERVICE
 ```
 
-## License
+## License    
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
