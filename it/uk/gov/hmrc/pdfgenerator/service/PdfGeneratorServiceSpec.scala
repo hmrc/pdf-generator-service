@@ -1,8 +1,6 @@
 package uk.gov.hmrc.pdfgenerator.service
 
-import com.typesafe.config.ConfigFactory
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.Configuration
 import uk.gov.hmrc.pdfgenerator.resources._
 
 
@@ -21,7 +19,6 @@ class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers{
       assert(triedFile.isSuccess)
     }
   }
-
 
 
 }
