@@ -47,18 +47,18 @@ trait MicroService {
 
         import scala.sys.process._
         val tempDir = IO.createTemporaryDirectory
-        val extraDir = target.value / "app"
+        val extraDir = target.value / "extra"
         val binDir: File = extraDir / "bin"
         val ghostscript = new File(tempDir, "ghostscript.tgz")
         extraDir.mkdir()
         binDir.mkdir()
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/ghostscript/ghostscript-9.20-linux-x86_64.tgz"), ghostscript)
-        (s"tar zxf ${ghostscript.absolutePath} -C ${binDir.getAbsoluteFile} --strip-components=1" !)
+        (s"tar -zxf ${ghostscript.absolutePath} -C ${binDir.getAbsoluteFile} --strip-components=1" !)
         ghostscript.delete()
 
         val wkhtmltox = new File(tempDir, "tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
-        (s"tar xJf ${wkhtmltox.absolutePath} -C ${extraDir.getAbsoluteFile} --strip-components=1" !)
+        (s"tar -xJf ${wkhtmltox.absolutePath} -C ${extraDir.getAbsoluteFile} --strip-components=1" !)
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
