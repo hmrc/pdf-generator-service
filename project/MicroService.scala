@@ -58,7 +58,8 @@ trait MicroService {
 
         val wkhtmltox = new File(tempDir, "tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
-        (s"tar -xJf ${wkhtmltox.absolutePath} -C ${extraDir.getAbsoluteFile} --strip-components=1" !)
+        (s"xz -d ${wkhtmltox.absolutePath}" !)
+        (s"tar -xf ${wkhtmltox.absolutePath} -C ${extraDir.getAbsoluteFile} --strip-components=1" !)
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
