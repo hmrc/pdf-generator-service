@@ -13,13 +13,6 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.Success
 
-object PdfGeneratorController {
-  @Inject()
-  val configuration: Configuration = null
-  def apply: PdfGeneratorController = new PdfGeneratorController(PdfGeneratorService.apply)
-}
-
-
 class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorService) extends BaseController with HtmlSupport {
 
 

@@ -4,14 +4,13 @@ import java.io.File
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.concurrent.ScalaFutures
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import uk.gov.hmrc.pdfgenerator.service.{PdfGeneratorService, ResourceHelper}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import com.kenshoo.play.metrics.PlayModule
-
 import uk.gov.hmrc.pdfgenerator.resources._
 
 import scala.util.Try
@@ -55,7 +54,7 @@ class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with 
 
 
 
-class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration, MockResourceHelper) {
+class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration, MockResourceHelper, Environment.simple()) {
 
   override def generateCompliantPdfA(html: String): Try[File] = {
 
