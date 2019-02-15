@@ -54,13 +54,11 @@ trait MicroService {
         binDir.mkdir()
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/ghostscript/ghostscript-9.20-linux-x86_64.tgz"), ghostscript)
         s"tar zxf ${ghostscript.absolutePath} -C ${binDir.getAbsoluteFile} --strip-components 1".!
-        s"chmod +x ${binDir.getAbsoluteFile}/gs-920-linux_x86_64".!
         ghostscript.delete()
 
         val wkhtmltox = new File(tempDir, "tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
         s"tar xJf ${wkhtmltox.absolutePath} -C ${extraDir.getAbsoluteFile} --strip-components 1".!
-        s"chmod +x ${binDir.getAbsoluteFile}/wkhtmltopdf".!
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
