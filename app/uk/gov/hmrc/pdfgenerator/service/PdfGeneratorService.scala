@@ -8,6 +8,7 @@ import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 
 import scala.util.{Failure, Success, Try}
+import scala.collection.JavaConverters._
 
 trait InitHook {
   def init(): Unit
@@ -53,7 +54,15 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val PS_DEF_FILE_FULL_PATH: String = CONF_DIR + BARE_PS_DEF_FILE
   val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
 
+  val wktohtmlFile = new File(WK_TO_HTML_EXECUABLE)
+
+  wktohtmlFile.listFiles.foreach {
+    file =>
+      Logger.warn(s"${file.toString} executable ${file.canExecute}")
+  }
+
   Logger.warn(s"$WK_TO_HTML_EXECUABLE exists: ${new File(WK_TO_HTML_EXECUABLE).exists}")
+  Logger.warn(s"$WK_TO_HTML_EXECUABLE isDirectory: ${new File(WK_TO_HTML_EXECUABLE).isDirectory}")
   Logger.warn(s"$WK_TO_HTML_EXECUABLE canExecute: ${new File(WK_TO_HTML_EXECUABLE).canExecute}")
 
 
