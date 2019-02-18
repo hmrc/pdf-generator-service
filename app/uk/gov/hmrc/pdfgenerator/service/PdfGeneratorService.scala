@@ -45,7 +45,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-  val GS_ALIAS: String = default(configuration, "gsAlias", "/app/bin/gs-920-linux_x86_64")
+ // val GS_ALIAS: String = default(configuration, "gsAlias", "/bin/gs-920-linux_x86_64")
+  val GS_ALIAS: String = environment.rootPath.getAbsolutePath + "/bin/gs-920-linux_x86_64"
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
   val WK_TO_HTML_EXECUABLE: String = environment.rootPath.getAbsolutePath + "/bin/wkhtmltopdf"
