@@ -10,7 +10,7 @@ import uk.gov.hmrc.play.test.WithFakeApplication
 object PdfGeneratorServiceIntegrationFixture {
   def html : String = "<html><head></head><body><p>Hello</p></body></html>"
 }
-
+`
 
 class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with WithFakeApplication{
 
