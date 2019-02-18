@@ -55,15 +55,14 @@ trait MicroService {
 
         val ghostscript = new File(tempDir, "ghostscript.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/ghostscript/ghostscript-9.20-linux-x86_64.tgz"), ghostscript)
-        s"tar zxf ${ghostscript.absolutePath.replaceAll("\\s", "\\ ")} -C ${binDir.getAbsolutePath.replaceAll("\\s", "\\ ")} --strip-components 1".!
-        s"chmod +x ${binDir.getAbsolutePath.replaceAll("\\s", "\\ ")}/gs-920-linux_x86_64".!
+        s"tar zxf ${tempDir / ghostscript.getName} -C ./target/extra/bin/ --strip-components 1".!
+        s"chmod +x ${binDir.getPath}/gs-920-linux_x86_64".!
         ghostscript.delete()
 
-
-        val wkhtmltox = new File(extraDir, "wkhtmltopdf.tgz")
+        val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
-        s"tar xJf ${wkhtmltox.absolutePath.replaceAll("\\s", "\\ ")} -C ${extraDir.getAbsolutePath.replaceAll("\\s", "\\ ")} --strip-components 1".!
-        s"chmod +x ${binDir.getAbsolutePath.replaceAll("\\s", "\\ ")}/wkhtmltopdf".!
+        s"tar xJf ${tempDir / wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
+        s"chmod +x ${binDir.getPath}/wkhtmltopdf".!
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
