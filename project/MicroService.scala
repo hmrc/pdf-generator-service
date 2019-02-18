@@ -62,7 +62,7 @@ trait MicroService {
         val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
         s"tar xJf ${tempDir / wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
-        s"chmod +x ./target/extra/wkhtmltopdf".!
+        s"chmod +x ./target/extra/bin/wkhtmltopdf".!
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
