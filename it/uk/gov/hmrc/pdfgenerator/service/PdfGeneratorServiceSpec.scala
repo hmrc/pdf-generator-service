@@ -11,7 +11,6 @@ object PdfGeneratorServiceIntegrationFixture {
   def html : String = "<html><head></head><body><p>Hello</p></body></html>"
 }
 
-
 class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with WithFakeApplication{
 
 
@@ -24,7 +23,4 @@ class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with
       assert(triedFile.isSuccess)
     }
   }
-
-
-
 }

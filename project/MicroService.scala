@@ -49,20 +49,24 @@ trait MicroService {
         val tempDir = IO.createTemporaryDirectory
         val extraDir = target.value / "extra"
         val binDir: File = extraDir / "bin"
-        val ghostscript = new File(tempDir, "ghostscript.tgz")
+
         extraDir.mkdir()
         binDir.mkdir()
+
+        val ghostscript = new File(tempDir, "ghostscript.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/ghostscript/ghostscript-9.20-linux-x86_64.tgz"), ghostscript)
-        s"tar zxf ${ghostscript.absolutePath} -C ${binDir.getAbsoluteFile} --strip-components 1".!
+        s"tar zxf ${tempDir / ghostscript.getName} -C ./target/extra/bin/ --strip-components 1".!
+        s"chmod +x ./target/extra/bin/gs-920-linux_x86_64".!
         ghostscript.delete()
 
-        val wkhtmltox = new File(tempDir, "tgz")
+        val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
-        s"tar xJf ${wkhtmltox.absolutePath} -C ${extraDir.getAbsoluteFile} --strip-components 1".!
+        s"tar xJf ${tempDir / wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
+        s"chmod +x ./target/extra/bin/wkhtmltopdf".!
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
-      distTgzTask := (distTgzTask dependsOn downloadBinaryDependenciesTask).value
+      update := (update dependsOn downloadBinaryDependenciesTask).value
     )
     .settings(
       Keys.fork in IntegrationTest := false,
