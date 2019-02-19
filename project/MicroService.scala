@@ -66,7 +66,7 @@ trait MicroService {
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
-      distTgzTask := (distTgzTask dependsOn downloadBinaryDependenciesTask).value
+      update := (update dependsOn downloadBinaryDependenciesTask).value
     )
     .settings(
       Keys.fork in IntegrationTest := false,
