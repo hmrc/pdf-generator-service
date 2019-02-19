@@ -30,25 +30,31 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
-    Try[String] {
-      val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
-      value match {
-        case EMPTY_INDICATOR => productionDefault
-        case _: String => value
-      }
-    } match {
-      case Success(value) => value
-      case Failure(_) => {
-        Logger.error(s"Failed to find a value for ${key} defaulting to ${productionDefault}")
-        productionDefault
+    environment.mode match {
+      case Mode.Test => productionDefault
+      case Mode.Prod => productionDefault
+      case Mode.Dev  => {
+        Try[String] {
+          val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
+          value match {
+            case EMPTY_INDICATOR => productionDefault
+            case _: String => value
+          }
+        } match {
+          case Success(value) => value
+          case Failure(_) => {
+            Logger.error(s"Failed to find a value for ${key} defaulting to ${productionDefault}")
+            productionDefault
+          }
+        }
       }
     }
-  }
+    }
 
   private def getEnvironmentPath(file: String) ={
     environment.mode match {
       case Mode.Dev  => s"/target/extra/bin/$file"
-      case Mode.Test => s"/bin/$file"
+      case Mode.Test => s"/target/extra/bin/$file"
       case Mode.Prod => s"/bin/$file"
     }
   }
