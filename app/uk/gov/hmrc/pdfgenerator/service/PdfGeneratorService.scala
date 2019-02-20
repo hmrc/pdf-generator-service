@@ -53,19 +53,19 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def getEnvironmentPath(file: String) ={
     environment.mode match {
-      case Mode.Dev  => s"/target/extra/bin/$file"
-      case Mode.Test => s"/target/extra/bin/$file"
-      case Mode.Prod => s"/bin/$file"
+      case Mode.Dev  => s"./target/extra/bin/$file"
+      case Mode.Test => s"./target/extra/bin/$file"
+      case Mode.Prod => s"./bin/$file"
     }
   }
 
   val GS_ALIAS: String = {
-    default(configuration, "gsAlias", environment.rootPath.getAbsolutePath + getEnvironmentPath("gs-920-linux_x86_64"))
+    default(configuration, "gsAlias", getEnvironmentPath("gs-920-linux_x86_64"))
   }
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
   val WK_TO_HTML_EXECUABLE: String = {
-    default(configuration, "wkHtmlToPdfExecutable", environment.rootPath.getAbsolutePath + getEnvironmentPath("wkhtmltopdf"))
+    default(configuration, "wkHtmlToPdfExecutable", getEnvironmentPath("wkhtmltopdf"))
   }
   val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
   val ADOBE_COLOR_PROFILE: String = default(configuration, "adobeColorProfile", "AdobeRGB1998.icc")
