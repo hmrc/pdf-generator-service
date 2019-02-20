@@ -73,6 +73,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
 
   private def logConfig(): Unit = {
+    val kwhtmlfile = new File(WK_TO_HTML_EXECUABLE)
+    Logger.debug(s"\n path ${kwhtmlfile.getAbsolutePath} \n exists ${kwhtmlfile.exists()} \n can execute ${kwhtmlfile.canExecute}")
 
     Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
       s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUABLE} " +
