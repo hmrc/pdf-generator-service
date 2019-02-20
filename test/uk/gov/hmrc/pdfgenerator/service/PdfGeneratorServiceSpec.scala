@@ -17,7 +17,7 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
       assert(service.PS_DEF_FILE_FULL_PATH == service.PROD_ROOT + "PDFA_def.ps")
       assert(!service.BASE_DIR_DEV_MODE)
       assert(service.GS_ALIAS.endsWith("/bin/gs-920-linux_x86_64"))
-      assert(service.WK_TO_HTML_EXECUABLE.endsWith("/bin/wkhtmltopdf"))
+      assert(service.WK_TO_HTML_EXECUTABLE.endsWith("/bin/wkhtmltopdf"))
 
     }
   }
