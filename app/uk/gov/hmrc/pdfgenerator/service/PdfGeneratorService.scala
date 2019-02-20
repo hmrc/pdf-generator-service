@@ -54,7 +54,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   private def getEnvironmentPath(file: String) ={
     environment.mode match {
       case Mode.Dev  => s"./target/extra/bin/$file"
-      case Mode.Test => s"./target/extra/bin/$file"
+      case Mode.Test => s"./bin/$file"
       case Mode.Prod => s"./bin/$file"
     }
   }
