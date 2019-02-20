@@ -63,7 +63,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   val GS_ALIAS: String = {
-    default(configuration, "gsAlias", getBaseDir+getEnvironmentPath("gs-920-linux_x86_64"))
+    default(configuration, "gsAlias", "./"+getEnvironmentPath("gs-920-linux_x86_64"))
   }
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
