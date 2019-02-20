@@ -67,7 +67,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
-  val WK_TO_HTML_EXECUABLE: String = {
+  val WK_TO_HTML_EXECUTABLE: String = {
     default(configuration, "wkHtmlToPdfExecutable", getBaseDir+getEnvironmentPath("wkhtmltopdf"))
   }
   val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
@@ -80,7 +80,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     Logger.debug(s"\n path ${checkfile.getAbsolutePath} \n exists ${checkfile.exists()} \n can execute ${checkfile.canExecute}")
 
     Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
-      s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUABLE} " +
+      s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUTABLE} " +
       s"\nPS_DEF: ${BARE_PS_DEF_FILE} \nADOBE_COLOR_PROFILE: ${ADOBE_COLOR_PROFILE} \nPDFA_CONF: ${PS_DEF_FILE_FULL_PATH} \nICC_CONF: " +
       s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n Diskspace: ${PdfGeneratorMetric.gauge.getValue}Mb")
   }
@@ -123,7 +123,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     import io.github.cloudify.scala.spdf._
 
     Try {
-      val pdf: Pdf = Pdf(WK_TO_HTML_EXECUABLE, new PdfConfig {
+      val pdf: Pdf = Pdf(WK_TO_HTML_EXECUTABLE, new PdfConfig {
         orientation := Portrait
         pageSize := "A4"
         marginTop := "1in"
@@ -136,7 +136,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
       val outputFile: File = new File(inputFileName)
       val exitCode = pdf.run(html, outputFile)
-      checkExitCode(exitCode, WK_TO_HTML_EXECUABLE)
+      checkExitCode(exitCode, WK_TO_HTML_EXECUTABLE)
       checkOutputFile(inputFileName, outputFile)
     }
   }
