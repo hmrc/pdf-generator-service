@@ -24,15 +24,18 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   // From application.conf or environment specific
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
-  def getBaseDir: String = BASE_DIR_DEV_MODE match {
-    case true => new File(".").getCanonicalPath + "/"
-    case _ => PROD_ROOT
+  def getBaseDir: String = {
+    Logger.info(s"BASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE")
+    BASE_DIR_DEV_MODE match {
+      case true => new File(".").getCanonicalPath + "/"
+      case _ => PROD_ROOT
+    }
   }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
     environment.mode match {
-      case Mode.Test => productionDefault
       case Mode.Prod => productionDefault
+      case Mode.Test => productionDefault
       case Mode.Dev  => {
         Try[String] {
           val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
@@ -53,9 +56,9 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def getEnvironmentPath(file: String) ={
     environment.mode match {
-      case Mode.Dev  => s"target/extra/bin/$file"
-      case Mode.Test => s"target/extra/bin/$file"
       case Mode.Prod => s"bin/$file"
+      case Mode.Test => s"target/extra/bin/$file"
+      case Mode.Dev  => s"target/extra/bin/$file"
     }
   }
 
