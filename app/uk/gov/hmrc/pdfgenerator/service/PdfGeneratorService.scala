@@ -155,12 +155,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
-    def clean(a: String) = {a.replaceAll(" ", "\\ ")}
-
-    // as is the command returns exit code 1 ~ used for wrong inputs eg: int/0
-
     val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
-      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PS_DEF_FILE_FULL_PATH + " " + inputFileName + ""
+      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PS_DEF_FILE_FULL_PATH + " " + inputFileName
 
     Logger.debug(s"Running: ${command}")
 
