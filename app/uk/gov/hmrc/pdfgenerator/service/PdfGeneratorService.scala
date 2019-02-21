@@ -63,7 +63,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   val GS_ALIAS: String = {
-    default(configuration, "gsAlias", "./"+getEnvironmentPath("gs-920-linux_x86_64"))
+    default(configuration, "gsAlias", getBaseDir+getEnvironmentPath("gs-920-linux_x86_64"))
   }
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
@@ -72,7 +72,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
   val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
   val ADOBE_COLOR_PROFILE: String = default(configuration, "adobeColorProfile", "AdobeRGB1998.icc")
-  val PS_DEF_FILE_FULL_PATH: String = "./" + BARE_PS_DEF_FILE
+  val PS_DEF_FILE_FULL_PATH: String = getBaseDir + BARE_PS_DEF_FILE
   val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
 
   private def logConfig(): Unit = {
@@ -110,7 +110,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
 
     val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName)
-      .flatMap(_ => convertToPdfA("./"+inputFileName, "./" + outputFileName))
+      .flatMap(_ => convertToPdfA(getBaseDir+inputFileName, getBaseDir + outputFileName))
 
     cleanUpInputFile
     triedFile
