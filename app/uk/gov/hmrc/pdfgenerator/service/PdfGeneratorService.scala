@@ -25,47 +25,41 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
-      case true => new File(".").getCanonicalPath + "/"
-      case _ => PROD_ROOT
-    }
+    case true => new File(".").getCanonicalPath + "/"
+    case _ => PROD_ROOT
+  }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
-    environment.mode match {
-      case Mode.Prod => productionDefault
-      case Mode.Test => productionDefault
-      case Mode.Dev  => {
-        Try[String] {
-          val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
-          value match {
-            case EMPTY_INDICATOR => productionDefault
-            case _: String => if (new File(value).exists()) value else productionDefault
-          }
-        } match {
-          case Success(value) => value
-          case Failure(_) => {
-            Logger.error(s"Failed to find a value for ${key} defaulting to ${productionDefault}")
-            productionDefault
-          }
-        }
+    Try[String] {
+      val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
+      value match {
+        case EMPTY_INDICATOR => productionDefault
+        case _: String => if (new File(value).exists()) value else productionDefault
+      }
+    } match {
+      case Success(value) => value
+      case Failure(_) => {
+        Logger.error(s"Failed to find a value for ${key} defaulting to ${productionDefault}")
+        productionDefault
       }
     }
   }
 
-  private def getEnvironmentPath(file: String) ={
+  private def getEnvironmentPath(file: String) = {
     environment.mode match {
       case Mode.Prod => s"bin/$file"
       case Mode.Test => s"target/extra/bin/$file"
-      case Mode.Dev  => s"target/extra/bin/$file"
+      case Mode.Dev => s"target/extra/bin/$file"
     }
   }
 
   val GS_ALIAS: String = {
-    default(configuration, "gsAlias", getBaseDir+getEnvironmentPath("gs-920-linux_x86_64"))
+    default(configuration, "gsAlias", getBaseDir + getEnvironmentPath("gs-920-linux_x86_64"))
   }
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
   val WK_TO_HTML_EXECUTABLE: String = {
-    default(configuration, "wkHtmlToPdfExecutable", getBaseDir+getEnvironmentPath("wkhtmltopdf"))
+    default(configuration, "wkHtmlToPdfExecutable", getBaseDir + getEnvironmentPath("wkhtmltopdf"))
   }
   val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
   val ADOBE_COLOR_PROFILE: String = default(configuration, "adobeColorProfile", "AdobeRGB1998.icc")
@@ -110,7 +104,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
 
     val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName)
-      .flatMap(_ => convertToPdfA(getBaseDir+inputFileName, getBaseDir + outputFileName))
+      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
 
     cleanUpInputFile
     triedFile
