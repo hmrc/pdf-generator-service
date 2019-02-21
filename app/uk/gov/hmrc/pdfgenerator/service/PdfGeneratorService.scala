@@ -63,7 +63,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   val GS_ALIAS: String = {
-    default(configuration, "gsAlias", "./"+getEnvironmentPath("gs-920-linux_x86_64"))
+    default(configuration, "gsAlias", getBaseDir+getEnvironmentPath("gs-920-linux_x86_64"))
   }
   val BASE_DIR: String = default(configuration, "baseDir", getBaseDir)
   val CONF_DIR: String = default(configuration, "confDir", getBaseDir)
@@ -155,12 +155,12 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
+    def clean(a: String) = {a.replaceAll(" ", "\\ ")}
 
-    // THIS GS_ALIAS IS THE PROBLEM
-    // its path has spaces in when in jenkins
+    // as is the command returns exit code 1 ~ used for wrong inputs eg: int/0
 
     val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
-      "-sDEVICE=pdfwrite -o \"" + outputFileName + "\" \"" + PS_DEF_FILE_FULL_PATH + "\"  \"" + inputFileName + "\""
+      "-sDEVICE=pdfwrite -o " + clean(outputFileName) + " " + clean(PS_DEF_FILE_FULL_PATH) + " " + clean(inputFileName) + ""
 
     Logger.debug(s"Running: ${command}")
 
