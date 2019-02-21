@@ -24,13 +24,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   // From application.conf or environment specific
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
-  def getBaseDir: String = {
-    Logger.info(s"BASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE")
-    BASE_DIR_DEV_MODE match {
+  def getBaseDir: String = BASE_DIR_DEV_MODE match {
       case true => new File(".").getCanonicalPath + "/"
       case _ => PROD_ROOT
     }
-  }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
     environment.mode match {
@@ -52,7 +49,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
         }
       }
     }
-    }
+  }
 
   private def getEnvironmentPath(file: String) ={
     environment.mode match {
@@ -76,8 +73,11 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
 
   private def logConfig(): Unit = {
-    val checkfile = new File(GS_ALIAS)
-    Logger.debug(s"\n path ${checkfile.getAbsolutePath} \n exists ${checkfile.exists()} \n can execute ${checkfile.canExecute}")
+    val checkGSfile = new File(GS_ALIAS)
+    Logger.debug(s"\n absolutePath: ${checkGSfile.getAbsolutePath} \n exists: ${checkGSfile.exists()} \n canExecute: ${checkGSfile.canExecute}")
+
+    val checkWkfile = new File(WK_TO_HTML_EXECUTABLE)
+    Logger.debug(s"\n absolutePath: ${checkWkfile.getAbsolutePath} \n exists: ${checkWkfile.exists()} \n canExecute: ${checkWkfile.canExecute}")
 
     Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
       s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUTABLE} " +
