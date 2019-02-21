@@ -25,9 +25,9 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
-    case true => new File(".").getCanonicalPath + "/"
-    case _ => PROD_ROOT
-  }
+      case true => new File(".").getCanonicalPath + "/"
+      case _ => PROD_ROOT
+    }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
     Try[String] {
@@ -49,7 +49,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     environment.mode match {
       case Mode.Prod => s"bin/$file"
       case Mode.Test => s"target/extra/bin/$file"
-      case Mode.Dev => s"target/extra/bin/$file"
+      case Mode.Dev  => s"target/extra/bin/$file"
     }
   }
 
