@@ -6,6 +6,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Environment, Logger, Mode}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
+import sys.process._
 
 import scala.util.{Failure, Success, Try}
 
@@ -149,16 +150,16 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
-    val command: String = GS_ALIAS + " -dPDFA=1 -dPDFACompatibilityPolicy=1  -dNOOUTERSAVE -sProcessColorModel=DeviceRGB " +
-      "-sDEVICE=pdfwrite -o " + outputFileName + " " + PS_DEF_FILE_FULL_PATH + " " + inputFileName
+    val commands: Seq[String] = List(GS_ALIAS, "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
+                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
+                                    PS_DEF_FILE_FULL_PATH, inputFileName)
 
-    Logger.debug(s"Running: ${command}")
+    Logger.debug(s"Running: ${commands.mkString(" ")}")
 
     Try {
-      val process = Runtime.getRuntime().exec(command)
-      val exitCode = process.waitFor()
+      val exitCode = Process(commands).!
       val file = new File(outputFileName)
-      checkExitCode(exitCode, command)
+      checkExitCode(exitCode, commands.mkString(" "))
       checkOutputFile(outputFileName, file)
     }
 
