@@ -23,12 +23,15 @@ All requests use the HTTP `POST` method
 
 ## Request
 	* html-www-urlencoded-form with a single field 'html' that contains the html to be converted
+	* post Content-Type: application/json {"html": "<html><title>Some Html</title></html>"}
 
 ## Response
 	* HTTP 200 OK with a generated and downloadable PDF
 	* HTTP 400 Bad Request for invalid/error scenarios
 
 ## Run the application locally
+
+If you are running on a linux machine you do not need to install wkhtohtml of Ghostscript.
 
 * Install wktohtml https://wkhtmltopdf.org/downloads.html version 0.12.3
 * Install Ghostscript https://ghostscript.com/
@@ -41,7 +44,7 @@ To run the application execute
 sbt ~run 9852
 ```
 
-The endpoints can then be accessed with the base url http://localhost:9000/pdf-generator-service/pdf-generator/generate
+The endpoints can then be accessed with the base url http://localhost:9852/pdf-generator-service/pdf-generator/generate
 
 ## Tips on installing application on Ubuntu
 
