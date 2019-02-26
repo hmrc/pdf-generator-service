@@ -31,7 +31,7 @@ All requests use the HTTP `POST` method
 
 ## Run the application locally
 
-If you are running on a linux machine you do not need to install wkhtohtml of Ghostscript.
+If you are running on a linux machine you do not need to install wkhtohtml or Ghostscript.
 
 * Install wktohtml https://wkhtmltopdf.org/downloads.html version 0.12.3
 * Install Ghostscript https://ghostscript.com/
