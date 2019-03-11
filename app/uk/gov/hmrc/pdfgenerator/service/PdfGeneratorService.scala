@@ -35,7 +35,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
       val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
       value match {
         case EMPTY_INDICATOR => productionDefault
-        case _: String => if (new File(value).exists()) value else productionDefault
+        case _: String => value
       }
     } match {
       case Success(value) => value
