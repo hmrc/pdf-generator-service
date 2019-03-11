@@ -33,9 +33,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
     Try[String] {
       val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
-      value match {
-        case EMPTY_INDICATOR => productionDefault
-        case _: String => value
+      environment.mode match {
+        case Mode.Prod => productionDefault
+        case Mode.Test => productionDefault
+        case Mode.Dev  => value
       }
     } match {
       case Success(value) => value
