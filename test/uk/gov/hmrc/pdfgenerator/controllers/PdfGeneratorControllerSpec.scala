@@ -54,7 +54,7 @@ class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with 
 
 
 
-class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration, MockResourceHelper, Environment.simple()) {
+class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration, MockResourceHelper) {
 
   override def generateCompliantPdfA(html: String): Try[File] = {
 

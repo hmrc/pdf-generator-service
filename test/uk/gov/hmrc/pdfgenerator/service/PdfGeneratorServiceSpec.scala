@@ -9,7 +9,7 @@ import uk.gov.hmrc.pdfgenerator.resources._
 class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
 
   val testConfig = new Configuration(ConfigFactory.load("test-application.conf"))
-  val service = new PdfGeneratorService(testConfig, MockResourceHelper, Environment.simple())
+  val service = new PdfGeneratorService(testConfig, MockResourceHelper)
 
   "A PdfGeneratorService" should {
     "load the default production config values" in {

@@ -19,9 +19,7 @@ class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with
 
 
   val testConfig = new Configuration(ConfigFactory.load())
-  val simple = Environment.simple()
-  val environment = Environment.apply(simple.rootPath, simple.classLoader, Mode.Test)
-  val pdfGeneratorService = new PdfGeneratorService(testConfig, ResourceHelper.apply, environment)
+  val pdfGeneratorService = new PdfGeneratorService(testConfig, ResourceHelper.apply)
 
   "A PdfGeneratorService" should {
     "generate a pdf" in {

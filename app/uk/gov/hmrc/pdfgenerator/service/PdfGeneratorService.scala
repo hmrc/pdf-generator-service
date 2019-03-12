@@ -16,7 +16,7 @@ trait InitHook {
 }
 
 @Singleton
-class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper: ResourceHelper, environment: Environment) extends InitHook {
+class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper: ResourceHelper) extends InitHook {
 
   val EMPTY_INDICATOR = "EMPTY_FOR_PROD_DEFAULT"
   val PROD_ROOT = "/app/"
@@ -24,6 +24,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   // From application.conf or environment specific
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
+
+  val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
       case true => new File(".").getCanonicalPath + "/"
@@ -33,10 +35,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
     Try[String] {
       val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
-      environment.mode match {
-        case Mode.Prod => productionDefault
-        case Mode.Test => productionDefault
-        case Mode.Dev  => value
+      RUN_MODE match {
+        case "prod" => productionDefault
+        case "test" => productionDefault
+        case "dev"  => value
       }
     } match {
       case Success(value) => value
@@ -48,10 +50,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def getEnvironmentPath(file: String) = {
-    environment.mode match {
-      case Mode.Prod => s"bin/$file"
-      case Mode.Test => s"target/extra/bin/$file"
-      case Mode.Dev  => s"target/extra/bin/$file"
+    RUN_MODE match {
+      case "prod" => s"bin/$file"
+      case "test" => s"target/extra/bin/$file"
+      case "dev"  => s"target/extra/bin/$file"
     }
   }
 
