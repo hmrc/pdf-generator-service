@@ -4,7 +4,7 @@ import java.io.File
 
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.{Configuration, Environment, Mode}
+import play.api.Configuration
 import uk.gov.hmrc.play.test.WithFakeApplication
 
 import scala.util.Success

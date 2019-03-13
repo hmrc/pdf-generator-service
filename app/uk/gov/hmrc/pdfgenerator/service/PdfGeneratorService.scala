@@ -23,12 +23,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
-  val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
-
   val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
 
-  def getBaseDir: String = BASE_DIR_DEV_MODE match {
-      case true => new File(".").getCanonicalPath + "/"
+  def getBaseDir: String = RUN_MODE match {
+      case "dev" => new File(".").getCanonicalPath + "/"
       case _ => PROD_ROOT
     }
 
@@ -77,7 +75,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     val checkWkfile = new File(WK_TO_HTML_EXECUTABLE)
     Logger.debug(s"\n absolutePath: ${checkWkfile.getAbsolutePath} \n exists: ${checkWkfile.exists()} \n canExecute: ${checkWkfile.canExecute}")
 
-    Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
+    Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nRUN_MODE: ${RUN_MODE} " +
       s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUTABLE} " +
       s"\nPS_DEF: ${BARE_PS_DEF_FILE} \nADOBE_COLOR_PROFILE: ${ADOBE_COLOR_PROFILE} \nPDFA_CONF: ${PS_DEF_FILE_FULL_PATH} \nICC_CONF: " +
       s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n Diskspace: ${PdfGeneratorMetric.gauge.getValue}Mb")
