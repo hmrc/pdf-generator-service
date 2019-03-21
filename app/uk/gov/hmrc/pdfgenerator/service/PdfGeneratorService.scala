@@ -16,27 +16,27 @@ trait InitHook {
 }
 
 @Singleton
-class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper: ResourceHelper) extends InitHook {
+class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper: ResourceHelper, environment: Environment) extends InitHook {
 
   val EMPTY_INDICATOR = "EMPTY_FOR_PROD_DEFAULT"
   val PROD_ROOT = "/app/"
   val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
-  val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
+  val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
-  def getBaseDir: String = RUN_MODE match {
-      case "dev" => new File(".").getCanonicalPath + "/"
+  def getBaseDir: String = BASE_DIR_DEV_MODE match {
+      case true => new File(".").getCanonicalPath + "/"
       case _ => PROD_ROOT
     }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
     Try[String] {
       val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
-      RUN_MODE match {
-        case "prod" => productionDefault
-        case "test" => productionDefault
-        case "dev"  => value
+      environment.mode match {
+        case Mode.Prod => productionDefault
+        case Mode.Test => productionDefault
+        case Mode.Dev  => value
       }
     } match {
       case Success(value) => value
@@ -48,10 +48,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def getEnvironmentPath(file: String) = {
-    RUN_MODE match {
-      case "prod" => s"bin/$file"
-      case "test" => s"target/extra/bin/$file"
-      case "dev"  => s"target/extra/bin/$file"
+    environment.mode match {
+      case Mode.Prod => s"bin/$file"
+      case Mode.Test => s"target/extra/bin/$file"
+      case Mode.Dev  => s"target/extra/bin/$file"
     }
   }
 
@@ -75,7 +75,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     val checkWkfile = new File(WK_TO_HTML_EXECUTABLE)
     Logger.debug(s"\n absolutePath: ${checkWkfile.getAbsolutePath} \n exists: ${checkWkfile.exists()} \n canExecute: ${checkWkfile.canExecute}")
 
-    Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nRUN_MODE: ${RUN_MODE} " +
+    Logger.debug(s"\n\nPROD_ROOT: ${PROD_ROOT} \nCONFIG_KEY: ${CONFIG_KEY} \nBASE_DIR_DEV_MODE: ${BASE_DIR_DEV_MODE} " +
       s"\nGS_ALIAS: ${GS_ALIAS} \nBASE_DIR: ${BASE_DIR} \nCONF_DIR: ${CONF_DIR} \nWK_TO_HTML_EXECUABLE: ${WK_TO_HTML_EXECUTABLE} " +
       s"\nPS_DEF: ${BARE_PS_DEF_FILE} \nADOBE_COLOR_PROFILE: ${ADOBE_COLOR_PROFILE} \nPDFA_CONF: ${PS_DEF_FILE_FULL_PATH} \nICC_CONF: " +
       s"${ADOBE_COLOR_PROFILE_FULL_PATH}\n Diskspace: ${PdfGeneratorMetric.gauge.getValue}Mb")
