@@ -26,9 +26,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
 
   def getBaseDir: String = RUN_MODE match {
-      case "prod" => PROD_ROOT
-      case "test" => new File(".").getCanonicalPath + "/"
-      case "dev"  => new File(".").getCanonicalPath + "/"
+      case "dev" => new File(".").getCanonicalPath + "/"
+      case _ => PROD_ROOT
     }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String = {
