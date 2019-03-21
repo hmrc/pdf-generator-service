@@ -66,7 +66,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
   val BARE_PS_DEF_FILE: String = default(configuration, "psDef", "PDFA_def.ps")
   val ADOBE_COLOR_PROFILE: String = default(configuration, "adobeColorProfile", "AdobeRGB1998.icc")
-  val PS_DEF_FILE_FULL_PATH: String = getBaseDir + BARE_PS_DEF_FILE
+  val PS_DEF_FILE_FULL_PATH: String = CONF_DIR + BARE_PS_DEF_FILE
   val ADOBE_COLOR_PROFILE_FULL_PATH: String = CONF_DIR + ADOBE_COLOR_PROFILE
 
   private def logConfig(): Unit = {
