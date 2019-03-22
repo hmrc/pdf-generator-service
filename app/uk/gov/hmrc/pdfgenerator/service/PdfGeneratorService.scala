@@ -4,10 +4,14 @@ import java.io.{File, IOException}
 import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import play.api.{Configuration, Environment, Logger, Mode}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
-import sys.process._
 
+import scala.collection.JavaConverters._
+import scala.sys.process._
+import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 
 
@@ -23,7 +27,12 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
+
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
+  val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
+  val VALID_GOVUK_REGEX: String = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*")
+  val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
+
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
       case true => new File(".").getCanonicalPath + "/"
@@ -89,31 +98,55 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
       ADOBE_COLOR_PROFILE, ADOBE_COLOR_PROFILE_FULL_PATH)
   }
 
-  def generateCompliantPdfA(html: String): Try[File] = {
-
+  def generatePdf(html: String): Try[File] = {
     logConfig()
-
     val inputFileName: String = UUID.randomUUID.toString + ".pdf"
     val outputFileName: String = UUID.randomUUID.toString + ".pdf"
-    Logger.trace(s"generateCompliantPdfA from ${html}")
-    Logger.info(s"generateCompliantPdfA inputFileName: ${inputFileName} outputFileName: ${outputFileName}")
+    Logger.trace(s"generatePdf from $html")
+    val linksDisabled = getLinksDisabled(html)
 
-    def cleanUpInputFile = {
-      val inputFile = new File(BASE_DIR + inputFileName)
-      if (inputFile.exists()) {
-        inputFile.delete()
-      }
-    }
+    try {
 
-    val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName)
-      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
-
-    cleanUpInputFile
-    triedFile
-
+      val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName, linksDisabled)
+      if(linksDisabled){
+        triedFile.flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
+      } else {
+          Logger.warn("*** Generated PDF will not be PDF/A compliant as it contains valid gov.uk links ***")
+          triedFile
+        }
+      } finally { if(!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
   }
 
-  private def generatePdfFromHtml(html: String, inputFileName: String): Try[File] = {
+  private def deleteFile(fileName: String) = {
+    val file = new File(BASE_DIR + fileName)
+    if (file.exists()) {
+      file.delete()
+    }
+  }
+
+  /**
+    * Returns false if hyperlinks in source HTML are valid and true if links are invalid
+    * @param html source HTML
+    * @return true or false
+    */
+  def getLinksDisabled(html: String): Boolean = {
+    val links = extractLinksFromHtml(html)
+    if(onlyContainsValidLinks(links)) false else true
+  }
+
+  private def extractLinksFromHtml(html: String): List[String] = {
+    val doc: Document = Jsoup.parse(html)
+    Option(doc.getElementsByTag("a")) match {
+      case Some(links) => links.asScala.map(link => link.attr("href")).toList
+      case None        => List.empty
+    }
+  }
+
+  private def onlyContainsValidLinks(links: List[String]):Boolean = {
+    links.forall(link => link.matches(VALID_GOVUK_REGEX))
+  }
+
+  private def generatePdfFromHtml(html: String, inputFileName: String, linksDisabled: Boolean): Try[File] = {
     import java.io._
 
     import io.github.cloudify.scala.spdf._
@@ -126,7 +159,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
         marginBottom := "1in"
         marginLeft := "1in"
         marginRight := "1in"
-        disableExternalLinks := true
+        disableExternalLinks := linksDisabled
         disableInternalLinks := true
       })
 
@@ -138,11 +171,11 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def checkExitCode(exitCode: Int, message: String): Unit =
-    if (exitCode != 0) throw new IllegalStateException(s"${message} returned an exitCode of ${exitCode}")
+    if (exitCode != 0) throw new IllegalStateException(s"$message returned an exitCode of $exitCode")
 
 
   private def checkOutputFile(outputFileName: String, file: File): File = {
-    if (!file.exists()) throw new IOException(s"output file: ${outputFileName} does not exist")
+    if (!file.exists()) throw new IOException(s"output file: $outputFileName does not exist")
     else {
       file.deleteOnExit() // only when the JVM exits added for safety
       file
@@ -150,6 +183,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
+
+    Logger.info(s"generateCompliantPdfA inputFileName: $inputFileName outputFileName: $outputFileName")
 
     val commands: Seq[String] = List(GS_ALIAS, "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
                                     "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,

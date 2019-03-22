@@ -25,7 +25,7 @@ class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with
 
   "A PdfGeneratorService" should {
     "generate a pdf" in {
-      val triedFile = pdfGeneratorService.generateCompliantPdfA(PdfGeneratorServiceIntegrationFixture.html)
+      val triedFile = pdfGeneratorService.generatePdf(PdfGeneratorServiceIntegrationFixture.html)
       triedFile mustBe a[Success[File]]
     }
   }
