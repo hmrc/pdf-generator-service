@@ -4,10 +4,10 @@ import java.io.{File, IOException}
 import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment, Logger, Mode}
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
-import sys.process._
 
+import scala.sys.process._
 import scala.util.{Failure, Success, Try}
 
 
@@ -114,6 +114,37 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   }
 
+  import org.jsoup.Jsoup
+  import org.jsoup.nodes.Document
+
+  import scala.collection.JavaConverters._
+
+  def extractLinksFromHtml(html: String): List[String] = {
+    val doc: Document = Jsoup.parse(html)
+    Option(doc.getElementsByTag("a")) match {
+      case Some(links) => links.asScala.map(link => link.attr("href")).toList
+      case None        => List.empty
+    }
+  }
+
+  import scala.util.matching.Regex
+
+  def validLinkChecker(links: List[String]):Boolean = {
+     links.forall(link => regEprFilter(link))
+  }
+
+  def regEprFilter(link: String): Boolean = {
+    val htmlChecker: Regex = "https://[a-z.]*gov.uk/".r
+    link match {
+      case htmlChecker() => true
+      case _             => false
+    }
+  }
+
+  def externalLinkEnabler(html: String): Boolean = {
+    validLinkChecker(extractLinksFromHtml(html))
+  }
+
   private def generatePdfFromHtml(html: String, inputFileName: String): Try[File] = {
     import java.io._
 
@@ -127,7 +158,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
         marginBottom := "1in"
         marginLeft := "1in"
         marginRight := "1in"
-        disableExternalLinks := true
+        disableExternalLinks := externalLinkEnabler(html)
         disableInternalLinks := true
       })
 
