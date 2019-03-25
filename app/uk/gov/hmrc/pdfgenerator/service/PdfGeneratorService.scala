@@ -130,14 +130,14 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   import scala.util.matching.Regex
 
   def validLinkChecker(links: List[String]):Boolean = {
-     links.forall(link => regEprFilter(link))
+     links.forall(link => regExprChecker(link))
   }
 
-  def regEprFilter(link: String): Boolean = {
-    val htmlChecker: Regex = "https://[a-z.]*gov.uk/".r
+  def regExprChecker(link: String): Boolean = {
+    val validGovUkChecker: Regex = "https://[a-z.]*gov.uk[/a-z0-9-]*".r
     link match {
-      case htmlChecker() => true
-      case _             => false
+      case validGovUkChecker() => true
+      case _                   => false
     }
   }
 

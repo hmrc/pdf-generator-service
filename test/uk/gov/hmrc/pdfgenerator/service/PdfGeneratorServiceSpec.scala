@@ -22,42 +22,36 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
     }
   }
 
-  val testHtmlDoc =
+  val testHtmlDoc1 =
     <html>
       <body>
+        <a href="https://www.testa.gov.uk"></a>
+        <a href="https://www.testb.gov.uk"></a>
+        <a href="https://www.testc.gov.uk/characters"></a>
+        <a href="https://www.testc.gov.uk/cha-rac-ters/25245234/"></a>
       </body>
     </html>.mkString
+
 
   val testHtmlDoc2 =
     <html>
       <body>
-        <a href="https://www.matt.com"></a>
+        <a href="https://www.testa.com"></a>
+        <a href="http://www.testb.gov.uk"></a>
+        <a href="https://www.testc.gov.uk"></a>
       </body>
     </html>.mkString
 
-  val testHtmlDoc3 =
-    <html>
-      <body>
-        <a href="https://www.matt.com"></a>
-        <a href="https://www.matt.com"></a>
-      </body>
-    </html>.mkString
+  "externalLinkEnabler" should {
 
-  "extractLinksFromHtml" should {
-    "should return an empty list" in {
-      val result = service.extractLinksFromHtml(testHtmlDoc)
-      result.size mustBe 0
+    "should return true when only valid links are inside the html" in {
+      val result = service.externalLinkEnabler(testHtmlDoc1)
+      result mustBe true
     }
 
-
-    "should return a list of 1 links as strings" in {
-      val result = service.extractLinksFromHtml(testHtmlDoc2)
-      result.size mustBe 1
-    }
-
-    "should return a list of 2 links as strings" in {
-      val result = service.extractLinksFromHtml(testHtmlDoc3)
-      result.size mustBe 2
+    "should return false when any invalid links are inside the html" in {
+      val result = service.externalLinkEnabler(testHtmlDoc2)
+      result mustBe false
     }
   }
 }
