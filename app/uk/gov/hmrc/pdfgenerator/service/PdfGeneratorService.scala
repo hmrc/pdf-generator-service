@@ -15,7 +15,6 @@ import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 
 
-
 trait InitHook {
   def init(): Unit
 }

@@ -1,10 +1,9 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import com.typesafe.config.ConfigFactory
-import org.scalatest.{MustMatchers, WordSpec, Matchers}
-import play.api.{Configuration, Environment}
+import org.scalatest.{MustMatchers, WordSpec}
+import play.api.Configuration
 import uk.gov.hmrc.pdfgenerator.resources._
-import org.mockito.Mockito._
 
 class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
 
