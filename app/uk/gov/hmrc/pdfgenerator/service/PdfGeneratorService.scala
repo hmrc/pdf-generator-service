@@ -29,6 +29,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   // From application.conf or environment specific
   val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
   val VALID_GOVUK_REGEX: Regex = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*").r
+  val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String = RUN_MODE match {
       case "prod" => PROD_ROOT
@@ -151,7 +152,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
         marginBottom := "1in"
         marginLeft := "1in"
         marginRight := "1in"
-        disableExternalLinks := externalLinkEnabler(html)
+        disableExternalLinks := false
         disableInternalLinks := true
       })
 
@@ -176,7 +177,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
-    val commands: Seq[String] = List(GS_ALIAS, "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
+    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
                                     "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
                                     PS_DEF_FILE_FULL_PATH, inputFileName)
 

@@ -43,12 +43,12 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
 
   "externalLinkEnabler" should {
 
-    "should return true when only valid links are inside the html" in {
+    "return true when only valid links are inside the html" in {
       val result = service.externalLinkEnabler(testHtmlDoc1)
       result mustBe true
     }
 
-    "should return false when any invalid links are inside the html" in {
+    "return false when any invalid links are inside the html" in {
       val result = service.externalLinkEnabler(testHtmlDoc2)
       result mustBe false
     }
