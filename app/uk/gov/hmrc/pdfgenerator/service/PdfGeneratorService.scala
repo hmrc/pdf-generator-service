@@ -4,11 +4,16 @@ import java.io.{File, IOException}
 import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import play.api.{Configuration, Logger}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 
+import scala.collection.JavaConverters._
 import scala.sys.process._
+import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
+
 
 
 trait InitHook {
@@ -24,6 +29,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   // From application.conf or environment specific
   val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
+  val VALID_GOVUK_REGEX: Regex = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*").r
 
   def getBaseDir: String = RUN_MODE match {
       case "prod" => PROD_ROOT
@@ -114,12 +120,11 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   }
 
-  import org.jsoup.Jsoup
-  import org.jsoup.nodes.Document
+  def externalLinkEnabler(html: String): Boolean = {
+    validLinkChecker(extractLinksFromHtml(html))
+  }
 
-  import scala.collection.JavaConverters._
-
-  def extractLinksFromHtml(html: String): List[String] = {
+  private def extractLinksFromHtml(html: String): List[String] = {
     val doc: Document = Jsoup.parse(html)
     Option(doc.getElementsByTag("a")) match {
       case Some(links) => links.asScala.map(link => link.attr("href")).toList
@@ -127,22 +132,11 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-  import scala.util.matching.Regex
-
-  def validLinkChecker(links: List[String]):Boolean = {
-     links.forall(link => regExprChecker(link))
-  }
-
-  def regExprChecker(link: String): Boolean = {
-    val validGovUkChecker: Regex = "https://[a-z.]*gov.uk[/a-z0-9-]*".r
-    link match {
-      case validGovUkChecker() => true
+  private def validLinkChecker(links: List[String]):Boolean = {
+    links.forall(link => link match {
+      case VALID_GOVUK_REGEX() => true
       case _                   => false
-    }
-  }
-
-  def externalLinkEnabler(html: String): Boolean = {
-    validLinkChecker(extractLinksFromHtml(html))
+    })
   }
 
   private def generatePdfFromHtml(html: String, inputFileName: String): Try[File] = {
