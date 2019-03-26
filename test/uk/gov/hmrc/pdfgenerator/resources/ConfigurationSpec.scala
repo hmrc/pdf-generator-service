@@ -16,7 +16,7 @@ class ConfigurationSpec extends WordSpec with MustMatchers {
     "contain the dev values for the executables " in {
       assert(configuration.getString("pdfGeneratorService.gsAlias").isDefined)
       assert(configuration.getString("pdfGeneratorService.psDef").isDefined)
-      assert(configuration.getString("pdfGeneratorService.runmode").isDefined)
+      assert(configuration.getBoolean("pdfGeneratorService.baseDirDevMode").isDefined)
       assert(!configuration.getBoolean("RUBBISH").isDefined)
 
     }
