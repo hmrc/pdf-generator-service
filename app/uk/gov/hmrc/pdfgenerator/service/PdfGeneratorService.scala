@@ -113,11 +113,10 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
 
     val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName)
-      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
+//      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
 
-    cleanUpInputFile
+//    cleanUpInputFile
     triedFile
-
   }
 
   def externalLinkEnabler(html: String): Boolean = {
@@ -134,8 +133,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def validLinkChecker(links: List[String]):Boolean = {
     links.forall(link => link match {
-      case VALID_GOVUK_REGEX() => true
-      case _                   => false
+      case VALID_GOVUK_REGEX() => false
+      case _                   => true
     })
   }
 
@@ -175,22 +174,22 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-  private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
+//  private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
+//
+//    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
+//                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
+//                                    PS_DEF_FILE_FULL_PATH, inputFileName)
+//
+//    Logger.debug(s"Running: ${commands.mkString(" ")}")
+//
+//    Try {
+//      val exitCode = Process(commands).!
+//      val file = new File(outputFileName)
+//      checkExitCode(exitCode, commands.mkString(" "))
+//      checkOutputFile(outputFileName, file)
+//    }
 
-    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
-                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
-                                    PS_DEF_FILE_FULL_PATH, inputFileName)
-
-    Logger.debug(s"Running: ${commands.mkString(" ")}")
-
-    Try {
-      val exitCode = Process(commands).!
-      val file = new File(outputFileName)
-      checkExitCode(exitCode, commands.mkString(" "))
-      checkOutputFile(outputFileName, file)
-    }
-
-  }
+//  }
 
   /**
     * called once by the Guice Play framework as this class is a Singleton
