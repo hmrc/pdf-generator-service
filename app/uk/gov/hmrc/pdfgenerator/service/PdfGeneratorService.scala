@@ -105,18 +105,23 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     Logger.trace(s"generateCompliantPdfA from ${html}")
     Logger.info(s"generateCompliantPdfA inputFileName: ${inputFileName} outputFileName: ${outputFileName}")
 
-    def cleanUpInputFile = {
-      val inputFile = new File(BASE_DIR + inputFileName)
-      if (inputFile.exists()) {
-        inputFile.delete()
+    try {
+
+      val linkDisabled = externalLinkEnabler(html)
+
+      val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName, linkDisabled)
+      linkDisabled match {
+        case true => triedFile.flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
+        case false => triedFile
       }
+    }finally {deleteFile(inputFileName)}
+  }
+
+  def deleteFile(fileName: String) = {
+    val file = new File(BASE_DIR + fileName)
+    if (file.exists()) {
+      file.delete()
     }
-
-    val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName)
-//      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
-
-//    cleanUpInputFile
-    triedFile
   }
 
   def externalLinkEnabler(html: String): Boolean = {
@@ -138,7 +143,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     })
   }
 
-  private def generatePdfFromHtml(html: String, inputFileName: String): Try[File] = {
+  private def generatePdfFromHtml(html: String, inputFileName: String, linksDisabled: Boolean): Try[File] = {
     import java.io._
 
     import io.github.cloudify.scala.spdf._
@@ -151,7 +156,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
         marginBottom := "1in"
         marginLeft := "1in"
         marginRight := "1in"
-        disableExternalLinks := false
+        disableExternalLinks := linksDisabled
         disableInternalLinks := true
       })
 
@@ -174,22 +179,22 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-//  private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
-//
-//    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
-//                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
-//                                    PS_DEF_FILE_FULL_PATH, inputFileName)
-//
-//    Logger.debug(s"Running: ${commands.mkString(" ")}")
-//
-//    Try {
-//      val exitCode = Process(commands).!
-//      val file = new File(outputFileName)
-//      checkExitCode(exitCode, commands.mkString(" "))
-//      checkOutputFile(outputFileName, file)
-//    }
+  private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
-//  }
+    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
+                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
+                                    PS_DEF_FILE_FULL_PATH, inputFileName)
+
+    Logger.debug(s"Running: ${commands.mkString(" ")}")
+
+    Try {
+      val exitCode = Process(commands).!
+      val file = new File(outputFileName)
+      checkExitCode(exitCode, commands.mkString(" "))
+      checkOutputFile(outputFileName, file)
+    }
+
+  }
 
   /**
     * called once by the Guice Play framework as this class is a Singleton
