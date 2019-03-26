@@ -2,9 +2,9 @@ package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.File
 
-import com.typesafe.config.{ConfigFactory, ConfigValueFactory}
+import com.typesafe.config.ConfigFactory
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.Configuration
+import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.play.test.WithFakeApplication
 
 import scala.util.Success
@@ -18,12 +18,13 @@ object PdfGeneratorServiceIntegrationFixture {
 class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with WithFakeApplication{
 
 
-  val testConfig = new Configuration(ConfigFactory.load().withValue("pdfGeneratorService.runmode", ConfigValueFactory.fromAnyRef("test")))
-  val pdfGeneratorService = new PdfGeneratorService(testConfig, ResourceHelper.apply)
+  val testConfig = new Configuration(ConfigFactory.load())
+  val simple = Environment.simple()
+  val environment = Environment.apply(simple.rootPath, simple.classLoader, Mode.Test)
+  val pdfGeneratorService = new PdfGeneratorService(testConfig, ResourceHelper.apply, environment)
 
   "A PdfGeneratorService" should {
     "generate a pdf" in {
-      assert(pdfGeneratorService.RUN_MODE == "test")
       val triedFile = pdfGeneratorService.generateCompliantPdfA(PdfGeneratorServiceIntegrationFixture.html)
       triedFile mustBe a[Success[File]]
     }
