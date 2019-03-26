@@ -6,7 +6,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.{Configuration, Logger}
+import play.api.{Configuration, Environment, Logger, Mode}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 
 import scala.collection.JavaConverters._
@@ -96,35 +96,33 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
       ADOBE_COLOR_PROFILE, ADOBE_COLOR_PROFILE_FULL_PATH)
   }
 
-  def generateCompliantPdfA(html: String): Try[File] = {
-
+  def generatePdf(html: String): Try[File] = {
     logConfig()
-
     val inputFileName: String = UUID.randomUUID.toString + ".pdf"
     val outputFileName: String = UUID.randomUUID.toString + ".pdf"
-    Logger.trace(s"generateCompliantPdfA from ${html}")
-    Logger.info(s"generateCompliantPdfA inputFileName: ${inputFileName} outputFileName: ${outputFileName}")
+    Logger.trace(s"generatePdf from $html")
+    val linkDisabled = externalLinkEnabler(html)
 
     try {
 
-      val linkDisabled = externalLinkEnabler(html)
-
       val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName, linkDisabled)
-      linkDisabled match {
-        case true => triedFile.flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
-        case false => triedFile
-      }
-    }finally {deleteFile(inputFileName)}
+      if(linkDisabled){
+        triedFile.flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
+      } else {
+          Logger.warn("*** Generated PDF will not be PDF/A compliant as it contains valid gov.uk links ***")
+          triedFile
+        }
+      } finally { if(!linkDisabled) deleteFile(BASE_DIR + inputFileName) }
   }
 
-  def deleteFile(fileName: String) = {
+  private def deleteFile(fileName: String) = {
     val file = new File(BASE_DIR + fileName)
     if (file.exists()) {
       file.delete()
     }
   }
 
-  def externalLinkEnabler(html: String): Boolean = {
+  private def externalLinkEnabler(html: String): Boolean = {
     validLinkChecker(extractLinksFromHtml(html))
   }
 
@@ -168,11 +166,11 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   }
 
   private def checkExitCode(exitCode: Int, message: String): Unit =
-    if (exitCode != 0) throw new IllegalStateException(s"${message} returned an exitCode of ${exitCode}")
+    if (exitCode != 0) throw new IllegalStateException(s"$message returned an exitCode of $exitCode")
 
 
   private def checkOutputFile(outputFileName: String, file: File): File = {
-    if (!file.exists()) throw new IOException(s"output file: ${outputFileName} does not exist")
+    if (!file.exists()) throw new IOException(s"output file: $outputFileName does not exist")
     else {
       file.deleteOnExit() // only when the JVM exits added for safety
       file
@@ -181,7 +179,9 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
-    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
+    Logger.info(s"generateCompliantPdfA inputFileName: $inputFileName outputFileName: $outputFileName")
+
+    val commands: Seq[String] = List(GS_ALIAS, "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
                                     "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
                                     PS_DEF_FILE_FULL_PATH, inputFileName)
 

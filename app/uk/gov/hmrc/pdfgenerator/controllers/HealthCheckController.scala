@@ -16,7 +16,7 @@ class HealthCheckController @Inject()(val pdfGeneratorService: PdfGeneratorServi
   def health = Action.async { implicit request =>
     val timer = PdfGeneratorMetric.startHealthCheckTimer
 
-    pdfGeneratorService.generateCompliantPdfA("<p>health</p>") match {
+    pdfGeneratorService.generatePdf("<p>health</p>") match {
       case Success(file) => {
         file.delete()
         PdfGeneratorMetric.endHealthCheckTimer(timer)
