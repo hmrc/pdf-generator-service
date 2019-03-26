@@ -4,10 +4,14 @@ import java.io.{File, IOException}
 import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment, Logger, Mode}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import play.api.{Configuration, Logger}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
-import sys.process._
 
+import scala.collection.JavaConverters._
+import scala.sys.process._
+import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 
 
@@ -23,6 +27,9 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
+
+  val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
+  val VALID_GOVUK_REGEX: Regex = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*").r
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
@@ -106,11 +113,29 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
 
     val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName)
-      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
+//      .flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
 
-    cleanUpInputFile
+//    cleanUpInputFile
     triedFile
+  }
 
+  def externalLinkEnabler(html: String): Boolean = {
+    validLinkChecker(extractLinksFromHtml(html))
+  }
+
+  private def extractLinksFromHtml(html: String): List[String] = {
+    val doc: Document = Jsoup.parse(html)
+    Option(doc.getElementsByTag("a")) match {
+      case Some(links) => links.asScala.map(link => link.attr("href")).toList
+      case None        => List.empty
+    }
+  }
+
+  private def validLinkChecker(links: List[String]):Boolean = {
+    links.forall(link => link match {
+      case VALID_GOVUK_REGEX() => false
+      case _                   => true
+    })
   }
 
   private def generatePdfFromHtml(html: String, inputFileName: String): Try[File] = {
@@ -126,7 +151,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
         marginBottom := "1in"
         marginLeft := "1in"
         marginRight := "1in"
-        disableExternalLinks := true
+        disableExternalLinks := false
         disableInternalLinks := true
       })
 
@@ -149,22 +174,22 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-  private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
+//  private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
+//
+//    val commands: Seq[String] = List(GS_ALIAS, "-dPrinted=false", "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
+//                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
+//                                    PS_DEF_FILE_FULL_PATH, inputFileName)
+//
+//    Logger.debug(s"Running: ${commands.mkString(" ")}")
+//
+//    Try {
+//      val exitCode = Process(commands).!
+//      val file = new File(outputFileName)
+//      checkExitCode(exitCode, commands.mkString(" "))
+//      checkOutputFile(outputFileName, file)
+//    }
 
-    val commands: Seq[String] = List(GS_ALIAS, "-dPDFA=1", "-dPDFACompatibilityPolicy=1", "-dNOOUTERSAVE",
-                                    "-sProcessColorModel=DeviceRGB", "-sDEVICE=pdfwrite", "-o", outputFileName,
-                                    PS_DEF_FILE_FULL_PATH, inputFileName)
-
-    Logger.debug(s"Running: ${commands.mkString(" ")}")
-
-    Try {
-      val exitCode = Process(commands).!
-      val file = new File(outputFileName)
-      checkExitCode(exitCode, commands.mkString(" "))
-      checkOutputFile(outputFileName, file)
-    }
-
-  }
+//  }
 
   /**
     * called once by the Guice Play framework as this class is a Singleton

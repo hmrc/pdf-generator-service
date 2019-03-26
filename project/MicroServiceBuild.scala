@@ -22,6 +22,7 @@ private object AppDependencies {
 
   val compile = Seq(
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
+    "org.jsoup"   %  "jsoup"              % "1.10.2",
 
     ws,
     "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
