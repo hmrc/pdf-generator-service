@@ -29,7 +29,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   // From application.conf or environment specific
 
   val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
-  val VALID_GOVUK_REGEX: Regex = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*").r
+  val VALID_GOVUK_REGEX: String = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*")
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
@@ -101,18 +101,18 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     val inputFileName: String = UUID.randomUUID.toString + ".pdf"
     val outputFileName: String = UUID.randomUUID.toString + ".pdf"
     Logger.trace(s"generatePdf from $html")
-    val linkDisabled = externalLinkEnabler(html)
+    val linksDisabled = getLinksDisabled(html)
 
     try {
 
-      val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName, linkDisabled)
-      if(linkDisabled){
+      val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName, linksDisabled)
+      if(linksDisabled){
         triedFile.flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
       } else {
           Logger.warn("*** Generated PDF will not be PDF/A compliant as it contains valid gov.uk links ***")
           triedFile
         }
-      } finally { if(!linkDisabled) deleteFile(BASE_DIR + inputFileName) }
+      } finally { if(!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
   }
 
   private def deleteFile(fileName: String) = {
@@ -122,8 +122,14 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-  private def externalLinkEnabler(html: String): Boolean = {
-    validLinkChecker(extractLinksFromHtml(html))
+  /**
+    * Returns false if hyperlinks in source HTML are valid and true if links are invalid
+    * @param html source HTML
+    * @return true or false
+    */
+  def getLinksDisabled(html: String): Boolean = {
+    val links = extractLinksFromHtml(html)
+    if(onlyContainsValidLinks(links)) false else true
   }
 
   private def extractLinksFromHtml(html: String): List[String] = {
@@ -134,11 +140,8 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
-  private def validLinkChecker(links: List[String]):Boolean = {
-    links.forall(link => link match {
-      case VALID_GOVUK_REGEX() => false
-      case _                   => true
-    })
+  private def onlyContainsValidLinks(links: List[String]):Boolean = {
+    links.forall(link => link.matches(VALID_GOVUK_REGEX))
   }
 
   private def generatePdfFromHtml(html: String, inputFileName: String, linksDisabled: Boolean): Try[File] = {
