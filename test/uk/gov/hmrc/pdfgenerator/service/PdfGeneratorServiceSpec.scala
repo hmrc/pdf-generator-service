@@ -2,7 +2,7 @@ package uk.gov.hmrc.pdfgenerator.service
 
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{MustMatchers, WordSpec}
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.pdfgenerator.resources._
 
 class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
@@ -21,36 +21,37 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
     }
   }
 
-  val testHtmlDoc1 =
+  val validLinksHtml =
     <html>
       <body>
-        <a href="https://www.testa.gov.uk"></a>
-        <a href="https://www.testb.gov.uk"></a>
-        <a href="https://www.testc.gov.uk/characters"></a>
-        <a href="https://www.testc.gov.uk/cha-rac-ters/25245234/"></a>
+        <a href="https://www.testa.gov.uk">test1</a>
+        <a href="https://www.testb.gov.uk">test2</a>
+        <a href="https://www.testc.gov.uk/characters">test3</a>
+        <a href="https://www.testc.gov.uk/cha-rac-ters/25245234/">test4</a>
+        <a href="https://www.qa.tax.service.gov.uk/two-way-message-adviser-frontend/message/123/reply">test5</a>
       </body>
     </html>.mkString
 
 
-  val testHtmlDoc2 =
+  val invalidLinksHtml =
     <html>
       <body>
-        <a href="https://www.testa.com"></a>
-        <a href="http://www.testb.gov.uk"></a>
-        <a href="https://www.testc.gov.uk"></a>
+        <a href="https://www.testa.com">test1</a>
+        <a href="http://www.testb.gov.uk">test2</a>
+        <a href="https://www.testc.gov.uk">test3</a>
       </body>
     </html>.mkString
 
   "externalLinkEnabler" should {
 
-    "return true when only valid links are inside the html" in {
-      val result = service.externalLinkEnabler(testHtmlDoc1)
-      result mustBe true
+    "return false when only valid links are inside the html" in {
+      val result = service.getLinksDisabled(validLinksHtml)
+      result mustBe false
     }
 
-    "return false when any invalid links are inside the html" in {
-      val result = service.externalLinkEnabler(testHtmlDoc2)
-      result mustBe false
+    "return true when any invalid links are inside the html" in {
+      val result = service.getLinksDisabled(invalidLinksHtml)
+      result mustBe true
     }
   }
 }
