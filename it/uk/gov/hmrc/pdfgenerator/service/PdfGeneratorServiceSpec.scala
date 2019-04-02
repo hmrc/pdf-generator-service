@@ -13,6 +13,8 @@ import scala.util.Success
 
 object PdfGeneratorServiceIntegrationFixture {
   def html : String = "<html><head></head><body><p>Hello</p></body></html>"
+  def enableLinksFalse: Boolean = false
+  def enableLinksTrue: Boolean = true
 }
 
 class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with WithFakeApplication{
@@ -24,8 +26,12 @@ class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with
   val pdfGeneratorService = new PdfGeneratorService(testConfig, ResourceHelper.apply, environment)
 
   "A PdfGeneratorService" should {
-    "generate a pdf" in {
-      val triedFile = pdfGeneratorService.generatePdf(PdfGeneratorServiceIntegrationFixture.html)
+    "generate a pdf without links" in {
+      val triedFile = pdfGeneratorService.generatePdf(PdfGeneratorServiceIntegrationFixture.html, PdfGeneratorServiceIntegrationFixture.enableLinksFalse)
+      triedFile mustBe a[Success[File]]
+    }
+    "generate a pdf with links" in {
+      val triedFile = pdfGeneratorService.generatePdf(PdfGeneratorServiceIntegrationFixture.html, PdfGeneratorServiceIntegrationFixture.enableLinksTrue)
       triedFile mustBe a[Success[File]]
     }
   }
