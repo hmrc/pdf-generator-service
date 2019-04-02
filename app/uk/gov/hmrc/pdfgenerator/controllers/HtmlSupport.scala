@@ -1,9 +1,10 @@
 package uk.gov.hmrc.pdfgenerator.controllers
-import play.api.data.Forms.{single, text}
-import play.api.data.{Form, Mapping}
+import play.api.data.Forms.{boolean, default, mapping, text}
 import play.api.data.validation._
+import play.api.data.{Form, Mapping}
 
 import scala.util.matching.Regex
+
 
 /**
   * Created by peter on 22/03/2017.
@@ -26,12 +27,12 @@ trait HtmlSupport {
 
   val html: Mapping[String] = text verifying (Constraints.nonEmpty , noScriptTags)
 
-  def createForm() = {
-    Form(
-      single(
-        "html" -> html
-      )
-    )
-  }
+  case class PdfForm(html: String, createPdfA: Boolean)
 
+  def getPdfForm() = Form(
+      mapping(
+        "html" -> html,
+        "create-pdfa" -> default(boolean, false)
+      )(PdfForm.apply)(PdfForm.unapply)
+    )
 }

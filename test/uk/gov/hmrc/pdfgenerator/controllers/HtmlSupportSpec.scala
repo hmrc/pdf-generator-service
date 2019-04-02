@@ -1,14 +1,15 @@
 package uk.gov.hmrc.pdfgenerator.controllers
 
 import org.scalatest.{FlatSpec, Matchers}
-import play.api.data.FormError
-import reactivemongo.bson.Macros.Annotations.Key
+
 
 
 class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
 
 
   val HTML = "<html><body><h1>Some Html</h1></body></html>"
+
+  val createPdfA = false
 
   val HTML_WITH_SCRIPT_TAG = "<html><script>function(){};</script><body><h1>Some Html</h1></body></html>"
 
@@ -18,17 +19,18 @@ class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
 
   "HtmlSupport" should
     "bind a single non empty form element" in {
-    val form = createForm()
+    val form = getPdfForm()
 
-    form.bind(Map("html" -> HTML)).fold(_ => "errors", h => {
-      h shouldBe HTML
+    form.bind(Map("html" -> HTML,
+                  "createPdfA" -> createPdfA.toString)).fold(_ => "errors", h => {
+      h shouldBe PdfForm(HTML,createPdfA)
     })
 
   }
 
   it should
     "create a binding error if the html is empty" in {
-    val form = createForm()
+    val form = getPdfForm()
 
     form.bind(Map("html" -> "")).fold(form => {
       form.errors.size == 1
@@ -40,7 +42,7 @@ class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
 
   it should
     "create a binding error if the html is not present" in {
-    val form = createForm()
+    val form = getPdfForm()
 
     form.bind(Map("a" -> "b")).fold(form => {
       form.errors.size == 1
@@ -52,7 +54,7 @@ class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
 
   it should
     "create a binding error if the html contains a script tag" in {
-    val form = createForm()
+    val form = getPdfForm()
 
     form.bind(Map("html" -> HTML_WITH_SCRIPT_TAG)).fold(form => {
       form.errors.size shouldBe 1
