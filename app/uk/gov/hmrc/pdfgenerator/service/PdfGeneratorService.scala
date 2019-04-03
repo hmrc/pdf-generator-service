@@ -1,6 +1,7 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.{File, IOException}
+import java.net.URL
 import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
@@ -27,11 +28,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
   val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
-
-  val RUN_MODE = configuration.getString(CONFIG_KEY + "runmode").getOrElse("prod").toLowerCase
-  val VALID_GOVUK_REGEX: String = configuration.getString(CONFIG_KEY + "validGovRegex").getOrElse("https://[a-z.]*gov.uk[/a-z0-9-]*")
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
-
 
   def getBaseDir: String = BASE_DIR_DEV_MODE match {
       case true => new File(".").getCanonicalPath + "/"
@@ -97,12 +94,12 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
       ADOBE_COLOR_PROFILE, ADOBE_COLOR_PROFILE_FULL_PATH)
   }
 
-  def generatePdf(html: String, createPdfA: Boolean): Try[File] = {
+  def generatePdf(html: String, forcePdfA: Boolean): Try[File] = {
     logConfig()
     val inputFileName: String = UUID.randomUUID.toString + ".pdf"
     val outputFileName: String = UUID.randomUUID.toString + ".pdf"
     Logger.trace(s"generatePdf from $html")
-    val linksDisabled = if(createPdfA) true else getLinksDisabled(html)
+    val linksDisabled = if(forcePdfA) true else getLinksDisabled(html)
 
     try {
 
@@ -129,7 +126,9 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     * @return true or false
     */
   def getLinksDisabled(html: String): Boolean = {
+    val startTime = System.currentTimeMillis()
     val links = extractLinksFromHtml(html)
+    Logger.trace("Checking document for links took " + (System.currentTimeMillis() - startTime) + " milliseconds")
     if(onlyContainsValidLinks(links)) false else true
   }
 
@@ -141,8 +140,27 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
   }
 
+  private def parseUrl(url: String): Try[URL] = Try(new URL(url))
+
+  private def validateDomain(domain: String): Boolean = {
+    if (domain.endsWith("gov.uk") || domain.endsWith("localhost")) true
+    else {
+      Logger.warn(s"External link to $domain detected. All links in document will be disabled")
+      false
+    }
+  }
+
+  private def validateUrl(linkText: String): Boolean = {
+    parseUrl(linkText) match {
+      case Success(url) => validateDomain(url.getHost)
+      case Failure(e)   =>
+        Logger.error(s"Unable to parse link $linkText text as URL due to " + e.getMessage)
+        false
+    }
+  }
+
   private def onlyContainsValidLinks(links: List[String]):Boolean = {
-    links.forall(link => link.matches(VALID_GOVUK_REGEX))
+    links.forall(link => validateUrl(link))
   }
 
   private def generatePdfFromHtml(html: String, inputFileName: String, linksDisabled: Boolean): Try[File] = {

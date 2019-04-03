@@ -2,14 +2,12 @@ package uk.gov.hmrc.pdfgenerator.controllers
 
 import org.scalatest.{FlatSpec, Matchers}
 
-
-
 class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
 
 
   val HTML = "<html><body><h1>Some Html</h1></body></html>"
 
-  val createPdfA = false
+  val CREATE_PDF_A = false
 
   val HTML_WITH_SCRIPT_TAG = "<html><script>function(){};</script><body><h1>Some Html</h1></body></html>"
 
@@ -22,8 +20,8 @@ class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
     val form = getPdfForm()
 
     form.bind(Map("html" -> HTML,
-                  "createPdfA" -> createPdfA.toString)).fold(_ => "errors", h => {
-      h shouldBe PdfForm(HTML,createPdfA)
+                  "force-pdfa" -> CREATE_PDF_A.toString)).fold(_ => "errors", h => {
+      h shouldBe PdfForm(HTML,CREATE_PDF_A)
     })
 
   }

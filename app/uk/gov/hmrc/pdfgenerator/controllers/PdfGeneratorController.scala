@@ -30,7 +30,7 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
         Future.successful(BadRequest(errors))
       },
       pdf => {
-        pdfGeneratorService.generatePdf(pdf.html,pdf.createPdfA) match {
+        pdfGeneratorService.generatePdf(pdf.html,pdf.forcePdfA) match {
           case Success(file) => {
             PdfGeneratorMetric.successCount()
             PdfGeneratorMetric.endTimer(start)

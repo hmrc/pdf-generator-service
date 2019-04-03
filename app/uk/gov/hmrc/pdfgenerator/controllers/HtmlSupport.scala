@@ -27,12 +27,12 @@ trait HtmlSupport {
 
   val html: Mapping[String] = text verifying (Constraints.nonEmpty , noScriptTags)
 
-  case class PdfForm(html: String, createPdfA: Boolean)
+  case class PdfForm(html: String, forcePdfA: Boolean)
 
   def getPdfForm() = Form(
       mapping(
         "html" -> html,
-        "create-pdfa" -> default(boolean, false)
+        "force-pdfa" -> default(boolean, false)
       )(PdfForm.apply)(PdfForm.unapply)
     )
 }

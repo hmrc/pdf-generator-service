@@ -29,18 +29,25 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
         <a href="https://www.testc.gov.uk/characters">test3</a>
         <a href="https://www.testc.gov.uk/cha-rac-ters/25245234/">test4</a>
         <a href="https://www.qa.tax.service.gov.uk/two-way-message-adviser-frontend/message/123/reply">test5</a>
+        <a href="http://localhost:1234/test">test6</a>
       </body>
     </html>.mkString
 
 
-  val invalidLinksHtml =
+  val invalidLinksHtml1 =
     <html>
       <body>
         <a href="https://www.testa.com">test1</a>
-        <a href="http://www.testb.gov.uk">test2</a>
-        <a href="https://www.testc.gov.uk">test3</a>
       </body>
     </html>.mkString
+
+  val invalidLinksHtml2 =
+    <html>
+      <body>
+        <a href="http://www.testb.gov.uk.com">test2</a>
+      </body>
+    </html>.mkString
+
 
   "externalLinkEnabler" should {
 
@@ -49,8 +56,13 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
       result mustBe false
     }
 
-    "return true when any invalid links are inside the html" in {
-      val result = service.getLinksDisabled(invalidLinksHtml)
+    "return true when any invalid link does not contain correct domain" in {
+      val result = service.getLinksDisabled(invalidLinksHtml1)
+      result mustBe true
+    }
+
+    "return true when any invalid link does end with the correct domain" in {
+      val result = service.getLinksDisabled(invalidLinksHtml2)
       result mustBe true
     }
   }
