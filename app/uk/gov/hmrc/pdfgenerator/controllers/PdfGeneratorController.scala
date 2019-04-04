@@ -22,15 +22,15 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
 
     val start = PdfGeneratorMetric.startTimer()
 
-    val htmlForm = createForm()
+    val pdfForm = getPdfForm()
 
-    htmlForm.bindFromRequest.fold(
+    pdfForm.bindFromRequest.fold(
       badRequest => {
         val errors = badRequest.errors.map(formError => formError.key + " " + formError.messages.mkString(" ")).mkString(" : ")
         Future.successful(BadRequest(errors))
       },
-      html => {
-        pdfGeneratorService.generateCompliantPdfA(html) match {
+      pdf => {
+        pdfGeneratorService.generatePdf(pdf.html,pdf.forcePdfA) match {
           case Success(file) => {
             PdfGeneratorMetric.successCount()
             PdfGeneratorMetric.endTimer(start)

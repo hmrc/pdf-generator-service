@@ -22,8 +22,8 @@ All requests use the HTTP `POST` method
 	* Generated PDF must match the HTML page from which it was generated
 
 ## Request
-	* html-www-urlencoded-form with a single field 'html' that contains the html to be converted
-	* post Content-Type: application/json {"html": "<html><title>Some Html</title></html>"}
+	* html-www-urlencoded-form with a required field 'html' that contains the html to be converted and an optional 'force-pdfa' boolean field to enforce PDF/A generation.
+	* post Content-Type: application/json {"html": "<html><title>Some Html</title></html>", "force-pdfa":"false"}
 
 ## Response
 	* HTTP 200 OK with a generated and downloadable PDF

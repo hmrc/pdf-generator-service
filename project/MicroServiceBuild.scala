@@ -22,13 +22,13 @@ private object AppDependencies {
 
   val compile = Seq(
     "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
+    "org.jsoup"   %  "jsoup"              % "1.10.2",
 
     ws,
     "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
     "uk.gov.hmrc" %% "auth-client" % authClientVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
-    "io.github.cloudify" %% "spdf" % "1.3.1",
-    "org.apache.pdfbox" % "preflight" % "2.0.3"
+    "io.github.cloudify" %% "spdf" % "1.3.1"
   )
 
   trait TestDependencies {
@@ -43,7 +43,8 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.mockito" % "mockito-core" % "1.8.5" % scope
+        "org.mockito" % "mockito-core" % "1.8.5" % scope,
+        "org.apache.pdfbox" % "pdfbox" % "2.0.13"
       )
     }.test
   }

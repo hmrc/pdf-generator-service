@@ -28,7 +28,7 @@ class HealthCheckControllerSpec extends UnitSpec with WithFakeApplication with S
   "A HealthCheckController" should {
     "return 200 OK when all is fine" in {
 
-      when(mockPdfGeneratorService.generateCompliantPdfA("<p>health</p>")).thenReturn(triedFile)
+      when(mockPdfGeneratorService.generatePdf("<p>health</p>", true)).thenReturn(triedFile)
       val request = FakeRequest("GET", "/healthcheck/")
       val result = await(healthCheckController.health.apply(request))
       status(result) shouldBe Status.OK
@@ -38,7 +38,7 @@ class HealthCheckControllerSpec extends UnitSpec with WithFakeApplication with S
   "A HealthCheckController" should {
     "return 500 when there are issues building a pdf" in {
 
-      when(mockPdfGeneratorService.generateCompliantPdfA("<p>health</p>")).thenReturn(badTry)
+      when(mockPdfGeneratorService.generatePdf("<p>health</p>", true)).thenReturn(badTry)
       val request = FakeRequest("GET", "/healthcheck/")
       val result = await(healthCheckController.health.apply(request))
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
