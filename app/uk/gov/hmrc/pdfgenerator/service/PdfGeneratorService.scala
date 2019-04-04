@@ -110,7 +110,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
           Logger.warn("*** Generated PDF will not be PDF/A compliant as it contains valid gov.uk links ***")
           triedFile
         }
-      } finally { if(!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
+    } finally { if(!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
   }
 
   private def deleteFile(fileName: String) = {
@@ -134,10 +134,7 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
 
   private def extractLinksFromHtml(html: String): List[String] = {
     val doc: Document = Jsoup.parse(html)
-    Option(doc.getElementsByTag("a")) match {
-      case Some(links) => links.asScala.map(link => link.attr("href")).toList
-      case None        => List.empty
-    }
+    doc.getElementsByTag("a").asScala.map(link => link.attr("href")).toList
   }
 
   private def parseUrl(url: String): Try[URL] = Try(new URL(url))
