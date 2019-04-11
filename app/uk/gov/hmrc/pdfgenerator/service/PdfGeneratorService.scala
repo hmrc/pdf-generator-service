@@ -7,6 +7,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.libs.Files.TemporaryFile
 import play.api.{Configuration, Environment, Logger, Mode}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 
@@ -113,6 +114,20 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     } finally { if(!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
   }
 
+  def appendPdf(pdfFiles: TemporaryFile*): Try[File] = {
+    logConfig()
+    val outputFileName: String = UUID.randomUUID.toString + ".pdf"
+
+    Logger.trace(s"appendPdf with ${pdfFiles.map(_.file).mkString(" and ")}")
+
+    try {
+      val pdfPaths = pdfFiles.map(_.file.getAbsolutePath)
+      appendPdf(pdfPaths, getBaseDir + outputFileName)
+    } finally {
+      pdfFiles.foreach(_.clean())
+    }
+  }
+
   private def deleteFile(fileName: String) = {
     val file = new File(BASE_DIR + fileName)
     if (file.exists()) {
@@ -214,6 +229,25 @@ class PdfGeneratorService @Inject()(configuration: Configuration, resourceHelper
     }
 
   }
+
+  private def appendPdf(inputFileNames: Seq[String], outputFileName: String): Try[File] = {
+
+    Logger.info(s"appendPdf ${inputFileNames.map("inputFileName: " + _).mkString(" ")} outputFileName: $outputFileName")
+
+    val commands: Seq[String] = List(GS_ALIAS, "-dBATCH", "-dNOPAUSE", "-q", "-sDEVICE=pdfwrite",
+                                    s"-sOutputFile=$outputFileName") ++ inputFileNames
+
+    Logger.debug(s"Running: ${commands.mkString(" ")}")
+
+    Try {
+      val exitCode = Process(commands).!
+      val file = new File(outputFileName)
+      checkExitCode(exitCode, commands.mkString(" "))
+      checkOutputFile(outputFileName, file)
+    }
+
+  }
+
 
   /**
     * called once by the Guice Play framework as this class is a Singleton
