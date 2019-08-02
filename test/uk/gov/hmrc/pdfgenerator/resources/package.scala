@@ -12,8 +12,11 @@ package object resources {
   val configuration = new Configuration(ConfigFactory.load("application.conf"))
 
   object MockResourceHelper extends ResourceHelper {
-    override def setupExecutableSupportFiles(psDefFileBare: String, psDefFileFullPath: String, baserDir: String, colorProfileBare: String, colorProfileFullPath: String): Unit = {
-
-    }
+    override def setupExecutableSupportFiles(
+      psDefFileBare: String,
+      psDefFileFullPath: String,
+      baserDir: String,
+      colorProfileBare: String,
+      colorProfileFullPath: String): Unit = {}
   }
 }

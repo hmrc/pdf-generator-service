@@ -5,7 +5,7 @@ import org.scalatest.{MustMatchers, WordSpec}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.pdfgenerator.resources._
 
-class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
+class PdfGeneratorServiceSpec extends WordSpec with MustMatchers {
 
   val testConfig = new Configuration(ConfigFactory.load("test-application.conf"))
   val service = new PdfGeneratorService(testConfig, MockResourceHelper, Environment.simple())
@@ -33,7 +33,6 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
       </body>
     </html>.mkString
 
-
   val invalidLinksHtml1 =
     <html>
       <body>
@@ -47,7 +46,6 @@ class PdfGeneratorServiceSpec extends WordSpec with MustMatchers{
         <a href="http://www.testb.gov.uk.com">test2</a>
       </body>
     </html>.mkString
-
 
   "externalLinkEnabler" should {
 

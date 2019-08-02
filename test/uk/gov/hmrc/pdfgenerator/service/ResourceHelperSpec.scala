@@ -35,14 +35,13 @@ class ResourceHelperSpec extends WordSpec with MustMatchers {
       assert(testPsDefFile.exists(), "PS Def file should exist")
       assert(testColorProfileFile.exists(), "Color Profile File should exist")
 
-      val lines: Iterator[String] = Source fromFile psDefFullpath getLines()
-      assert(lines.exists( line => line.contains(colorProfileFullPath)), "Should have filtered the color profile path into the def file")
-
+      val lines: Iterator[String] = Source fromFile psDefFullpath getLines ()
+      assert(
+        lines.exists(line => line.contains(colorProfileFullPath)),
+        "Should have filtered the color profile path into the def file")
 
     }
   }
-
-
 
   private def setup(filename: String): File = {
     val file = new File(psDefFullpath)

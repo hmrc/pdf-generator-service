@@ -6,7 +6,6 @@ import uk.gov.hmrc.pdfgenerator.service.{InitHook, PdfGeneratorService}
   */
 class Module extends AbstractModule {
 
-  override def configure() = {
+  override def configure() =
     bind(classOf[InitHook]).to(classOf[PdfGeneratorService]).asEagerSingleton()
-  }
 }

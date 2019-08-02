@@ -5,6 +5,8 @@ import sbt._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import com.typesafe.sbt.SbtNativePackager._
 
+import sbt.ModuleID
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtOnCompile
 
 trait MicroService {
 
@@ -37,6 +39,7 @@ trait MicroService {
     .settings(
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
+      scalafmtOnCompile := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
       routesGenerator := StaticRoutesGenerator
     )
