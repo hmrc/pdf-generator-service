@@ -32,7 +32,6 @@ package uk.gov.hmrc.pdfgenerator.metrics
  * limitations under the License.
  */
 
-
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -43,12 +42,12 @@ import uk.gov.hmrc.play.graphite.MicroserviceMetrics
 sealed protected trait Timer {
   this: MicroserviceMetrics =>
 
-  val prefix : String
+  val prefix: String
 
   private def time(diff: Long, unit: TimeUnit) =
     metrics.defaultRegistry.timer(s"$prefix-timer").update(diff, unit)
 
-  def startTimer() : Long = System.currentTimeMillis()
+  def startTimer(): Long = System.currentTimeMillis()
 
   def endTimer(start: Long) = {
     val end = System.currentTimeMillis() - start
@@ -59,12 +58,12 @@ sealed protected trait Timer {
 sealed protected trait HealthCheckTimer {
   this: MicroserviceMetrics =>
 
-  val prefix : String
+  val prefix: String
 
   private def time(diff: Long, unit: TimeUnit) =
     metrics.defaultRegistry.timer(s"$prefix-health-check-timer").update(diff, unit)
 
-  def startHealthCheckTimer() : Long = System.currentTimeMillis()
+  def startHealthCheckTimer(): Long = System.currentTimeMillis()
 
   def endHealthCheckTimer(start: Long) = {
     val end = System.currentTimeMillis() - start
@@ -75,25 +74,22 @@ sealed protected trait HealthCheckTimer {
 sealed protected trait Connector {
   this: MicroserviceMetrics =>
 
-  val prefix : String
+  val prefix: String
 
-  def status(code: Int) : Unit = metrics.defaultRegistry.counter(s"$prefix-connector-status-$code").inc()
+  def status(code: Int): Unit = metrics.defaultRegistry.counter(s"$prefix-connector-status-$code").inc()
 }
 
 sealed trait PDFMetrics extends MicroserviceMetrics with Timer with Connector with HealthCheckTimer {
   Logger.info(s"[${super.getClass}][constructor] Initialising metrics interface")
 
-  val prefix : String
+  val prefix: String
 }
-
-
 
 /**
   * CountingMetrics
   * @param name name of the counter
   */
-
-sealed abstract class BasePdfGeneratorMetric(name : String) extends PDFMetrics {
+sealed abstract class BasePdfGeneratorMetric(name: String) extends PDFMetrics {
 
   override val prefix = name
 
@@ -104,18 +100,11 @@ sealed abstract class BasePdfGeneratorMetric(name : String) extends PDFMetrics {
   def failureCount() = metrics.defaultRegistry.counter(s"$prefix-failure-count").inc()
 }
 
-
-
 object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service") {
-
 
   lazy val gauge = new DiskSpaceGuage()
 
-  metrics.defaultRegistry.register[DiskSpaceGuage](s"${prefix}-free-disk-space-gauge",
-    gauge)
-
-
-
+  metrics.defaultRegistry.register[DiskSpaceGuage](s"$prefix-free-disk-space-gauge", gauge)
 
   class DiskSpaceGuage() extends Gauge[Int] {
 
@@ -123,7 +112,7 @@ object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service"
     val measureFile = new File("spaceTest.txt")
     measureFile.createNewFile()
 
-    override def getValue: Int = {
+    override def getValue: Int =
       try {
 
         val freeSpace = Math.toIntExact(measureFile.getFreeSpace / ONE_MILLION)
@@ -131,10 +120,9 @@ object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service"
         freeSpace
       } catch {
         case e => {
-          Logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}" )
+          Logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}")
           -1
         }
       }
-    }
   }
 }

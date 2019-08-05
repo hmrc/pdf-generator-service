@@ -4,7 +4,6 @@ import org.scalatest.{MustMatchers, WordSpec}
 import uk.gov.hmrc.pdfgenerator.service.ResourceHelper
 import uk.gov.hmrc.pdfgenerator.resources._
 
-
 import scala.io.Source
 
 /**

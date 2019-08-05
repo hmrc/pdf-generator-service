@@ -13,11 +13,10 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.Success
 
-class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorService) extends BaseController with HtmlSupport {
-
+class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorService)
+    extends BaseController with HtmlSupport {
 
   def generate = Action.async { implicit request =>
-
     Logger.debug("******* Generating PDF ***********")
 
     val start = PdfGeneratorMetric.startTimer()
@@ -26,11 +25,12 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
 
     pdfForm.bindFromRequest.fold(
       badRequest => {
-        val errors = badRequest.errors.map(formError => formError.key + " " + formError.messages.mkString(" ")).mkString(" : ")
+        val errors =
+          badRequest.errors.map(formError => formError.key + " " + formError.messages.mkString(" ")).mkString(" : ")
         Future.successful(BadRequest(errors))
       },
       pdf => {
-        pdfGeneratorService.generatePdf(pdf.html,pdf.forcePdfA) match {
+        pdfGeneratorService.generatePdf(pdf.html, pdf.forcePdfA) match {
           case Success(file) => {
             PdfGeneratorMetric.successCount()
             PdfGeneratorMetric.endTimer(start)
@@ -45,6 +45,5 @@ class PdfGeneratorController @Inject()(val pdfGeneratorService: PdfGeneratorServ
       }
     )
   }
-
 
 }

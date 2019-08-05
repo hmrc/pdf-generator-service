@@ -5,7 +5,6 @@ import play.api.data.{Form, Mapping}
 
 import scala.util.matching.Regex
 
-
 /**
   * Created by peter on 22/03/2017.
   */
@@ -15,24 +14,25 @@ trait HtmlSupport {
 
   val SCRIPT_ERROR_TAG = "error.noScriptTagsAllowed"
 
-  def noScriptTags(errorMessage: String = SCRIPT_ERROR_TAG): Constraint[String] = Constraint[String](SCRIPT_ERROR_TAG) { html =>
-    val maybeInvalid: Option[Invalid] = noScriptRegex.findFirstIn(html)
-      .map(_ => Invalid(ValidationError(errorMessage)))
+  def noScriptTags(errorMessage: String = SCRIPT_ERROR_TAG): Constraint[String] = Constraint[String](SCRIPT_ERROR_TAG) {
+    html =>
+      val maybeInvalid: Option[Invalid] = noScriptRegex
+        .findFirstIn(html)
+        .map(_ => Invalid(ValidationError(errorMessage)))
 
-    maybeInvalid.getOrElse(Valid)
+      maybeInvalid.getOrElse(Valid)
   }
-
 
   val noScriptTags: Constraint[String] = noScriptTags()
 
-  val html: Mapping[String] = text verifying (Constraints.nonEmpty , noScriptTags)
+  val html: Mapping[String] = text verifying (Constraints.nonEmpty, noScriptTags)
 
   case class PdfForm(html: String, forcePdfA: Boolean)
 
   def getPdfForm() = Form(
-      mapping(
-        "html" -> html,
-        "force-pdfa" -> default(boolean, true)
-      )(PdfForm.apply)(PdfForm.unapply)
-    )
+    mapping(
+      "html"       -> html,
+      "force-pdfa" -> default(boolean, true)
+    )(PdfForm.apply)(PdfForm.unapply)
+  )
 }

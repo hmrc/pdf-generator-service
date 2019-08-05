@@ -15,8 +15,7 @@ import uk.gov.hmrc.pdfgenerator.resources._
 
 import scala.util.Try
 
-
-class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with ScalaFutures  {
+class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
 
   override def bindModules = Seq(new PlayModule)
 
@@ -52,23 +51,19 @@ class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with 
 
 }
 
+class MockPdfGeneratorService(val configuration: Configuration)
+    extends PdfGeneratorService(configuration, MockResourceHelper, Environment.simple()) {
 
-
-class MockPdfGeneratorService (val configuration: Configuration) extends PdfGeneratorService(configuration, MockResourceHelper, Environment.simple()) {
-
-  override def generatePdf(html: String, enableLinks: Boolean): Try[File] = {
-
+  override def generatePdf(html: String, enableLinks: Boolean): Try[File] =
     Try {
       val testPdfFile = "PDFAcompliant.pdf"
 
       val file = new File(testPdfFile)
 
       if (!file.exists()) {
-        throw new IllegalStateException(s"Can't find pdf for MockPdfGeneratorService ${testPdfFile}")
+        throw new IllegalStateException(s"Can't find pdf for MockPdfGeneratorService $testPdfFile")
       }
       file
     }
-  }
-
 
 }

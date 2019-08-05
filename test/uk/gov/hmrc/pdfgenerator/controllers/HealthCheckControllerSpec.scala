@@ -49,6 +49,4 @@ class HealthCheckControllerSpec extends UnitSpec with WithFakeApplication with S
     throw new IOException("Mocking something going wrong")
   }
 
-
 }
-
