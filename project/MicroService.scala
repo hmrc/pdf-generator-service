@@ -49,7 +49,7 @@ trait MicroService {
       downloadBinaryDependenciesTask := {
 
         import scala.sys.process._
-        val tempDir = IO.createTemporaryDirectory
+        val tempDir = "/tmp"
         val extraDir = target.value / "extra"
         val binDir: File = extraDir / "bin"
 
@@ -59,14 +59,14 @@ trait MicroService {
         val ghostscript = new File(tempDir, "ghostscript.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/ghostscript/ghostscript-9.20-linux-x86_64.tgz"), ghostscript)
         s"mkdir -p ./target/extra/bin".!
-        s"echo ${tempDir.toString.replaceAll(" ", "\\\\ ") + "/" + ghostscript.getName}".!
-        s"""tar zxf ${tempDir.toString.replaceAll(" ", "\\\\ ") + "/" + ghostscript.getName} -C ./target/extra/bin/ --strip-components 1""".!
+        s"echo ${tempDir + "/" + ghostscript.getName}".!
+        s"""tar zxf ${tempDir + "/" + ghostscript.getName} -C ./target/extra/bin/ --strip-components 1""".!
         s"chmod +x ./target/extra/bin/gs-920-linux_x86_64".!
         ghostscript.delete()
 
         val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
         IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
-        s"tar xJf ${tempDir / wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
+        s"tar xJf ${tempDir + wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
         s"chmod +x ./target/extra/bin/wkhtmltopdf".!
         wkhtmltox.delete()
       },
