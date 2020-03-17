@@ -209,6 +209,7 @@ class PdfGeneratorService @Inject()(
       "-dPDFA=1",
       "-dPDFACompatibilityPolicy=1",
       "-dNOOUTERSAVE",
+      "-dNOSAFER",
       "-sProcessColorModel=DeviceRGB",
       "-sDEVICE=pdfwrite",
       "-o",
