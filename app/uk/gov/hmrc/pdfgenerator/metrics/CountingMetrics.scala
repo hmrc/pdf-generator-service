@@ -35,13 +35,13 @@ package uk.gov.hmrc.pdfgenerator.metrics
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-import com.codahale.metrics.{Gauge, MetricRegistry}
+import com.codahale.metrics.Gauge
+import com.kenshoo.play.metrics.Metrics
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
-import uk.gov.hmrc.play.graphite.MicroserviceMetrics
 
 sealed protected trait Timer {
-  this: MicroserviceMetrics =>
-
+  val metrics: Metrics
   val prefix: String
 
   private def time(diff: Long, unit: TimeUnit) =
@@ -56,8 +56,7 @@ sealed protected trait Timer {
 }
 
 sealed protected trait HealthCheckTimer {
-  this: MicroserviceMetrics =>
-
+  val metrics: Metrics
   val prefix: String
 
   private def time(diff: Long, unit: TimeUnit) =
@@ -72,16 +71,14 @@ sealed protected trait HealthCheckTimer {
 }
 
 sealed protected trait Connector {
-  this: MicroserviceMetrics =>
-
+  val metrics: Metrics
   val prefix: String
 
   def status(code: Int): Unit = metrics.defaultRegistry.counter(s"$prefix-connector-status-$code").inc()
 }
 
-sealed trait PDFMetrics extends MicroserviceMetrics with Timer with Connector with HealthCheckTimer {
+sealed trait PDFMetrics extends Timer with Connector with HealthCheckTimer {
   Logger.info(s"[${super.getClass}][constructor] Initialising metrics interface")
-
   val prefix: String
 }
 
@@ -100,7 +97,8 @@ sealed abstract class BasePdfGeneratorMetric(name: String) extends PDFMetrics {
   def failureCount() = metrics.defaultRegistry.counter(s"$prefix-failure-count").inc()
 }
 
-object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service") {
+@Singleton
+class PdfGeneratorMetric @Inject()(val metrics: Metrics) extends BasePdfGeneratorMetric("pdf-generator-service") {
 
   lazy val gauge = new DiskSpaceGuage()
 
@@ -114,7 +112,6 @@ object PdfGeneratorMetric extends BasePdfGeneratorMetric("pdf-generator-service"
 
     override def getValue: Int =
       try {
-
         val freeSpace = Math.toIntExact(measureFile.getFreeSpace / ONE_MILLION)
         Logger.debug(s"Getting free diskspace ${freeSpace}Mb")
         freeSpace

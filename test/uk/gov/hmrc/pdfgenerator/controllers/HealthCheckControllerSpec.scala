@@ -2,33 +2,40 @@ package uk.gov.hmrc.pdfgenerator.controllers
 
 import java.io.{File, IOException}
 
-import com.kenshoo.play.metrics.PlayModule
+import com.codahale.metrics.SharedMetricRegistries
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.Status
 import play.api.test.FakeRequest
+import play.api.test.Helpers.stubControllerComponents
+import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import org.mockito.Mockito.when
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.util.Try
 
-class HealthCheckControllerSpec extends UnitSpec with WithFakeApplication with ScalaFutures with MockitoSugar {
+class HealthCheckControllerSpec extends UnitSpec with GuiceOneAppPerTest with ScalaFutures with MockitoSugar {
 
-  override def bindModules = Seq(new PlayModule)
+  val mockPdfGeneratorService: PdfGeneratorService = mock[PdfGeneratorService]
+  val mockMetric: PdfGeneratorMetric = mock[PdfGeneratorMetric]
 
-  val mockPdfGeneratorService = mock[PdfGeneratorService]
+  val healthCheckController = new HealthCheckController(
+    mockPdfGeneratorService,
+    mockMetric,
+    stubControllerComponents()
+  )
 
-  val healthCheckController = new HealthCheckController(mockPdfGeneratorService)
+  when(mockMetric.startHealthCheckTimer()).thenReturn(1L)
 
   private val mockFile = new File("./target/testFileToDelete")
   mockFile.createNewFile()
-  val triedFile = Try(mockFile)
+  val triedFile: Try[File] = Try(mockFile)
 
   "A HealthCheckController" should {
     "return 200 OK when all is fine" in {
-
-      when(mockPdfGeneratorService.generatePdf("<p>health</p>", true)).thenReturn(triedFile)
+      when(mockPdfGeneratorService.generatePdf("<p>health</p>", forcePdfA = true)).thenReturn(triedFile)
       val request = FakeRequest("GET", "/healthcheck/")
       val result = await(healthCheckController.health.apply(request))
       status(result) shouldBe Status.OK
@@ -37,15 +44,14 @@ class HealthCheckControllerSpec extends UnitSpec with WithFakeApplication with S
 
   "A HealthCheckController" should {
     "return 500 when there are issues building a pdf" in {
-
-      when(mockPdfGeneratorService.generatePdf("<p>health</p>", true)).thenReturn(badTry)
+      when(mockPdfGeneratorService.generatePdf("<p>health</p>", forcePdfA = true)).thenReturn(badTry)
       val request = FakeRequest("GET", "/healthcheck/")
       val result = await(healthCheckController.health.apply(request))
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
   }
 
-  def badTry = Try {
+  def badTry: Try[Nothing] = Try {
     throw new IOException("Mocking something going wrong")
   }
 

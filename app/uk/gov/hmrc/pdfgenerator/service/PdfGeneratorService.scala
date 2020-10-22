@@ -12,19 +12,13 @@ import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 
 import scala.collection.JavaConverters._
 import scala.sys.process._
-import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
-
-trait InitHook {
-  def init(): Unit
-}
 
 @Singleton
 class PdfGeneratorService @Inject()(
   configuration: Configuration,
   resourceHelper: ResourceHelper,
-  environment: Environment)
-    extends InitHook {
+  environment: Environment) {
 
   val EMPTY_INDICATOR = "EMPTY_FOR_PROD_DEFAULT"
   val PROD_ROOT = "/app/"
@@ -33,10 +27,12 @@ class PdfGeneratorService @Inject()(
   // From application.conf or environment specific
   val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
-  def getBaseDir: String = BASE_DIR_DEV_MODE match {
-    case true => new File(".").getCanonicalPath + "/"
-    case _    => PROD_ROOT
-  }
+  def getBaseDir: String =
+    if (BASE_DIR_DEV_MODE) {
+      new File(".").getCanonicalPath + "/"
+    } else {
+      PROD_ROOT
+    }
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String =
     Try[String] {
@@ -48,10 +44,9 @@ class PdfGeneratorService @Inject()(
       }
     } match {
       case Success(value) => value
-      case Failure(_) => {
+      case Failure(_) =>
         Logger.error(s"Failed to find a value for $key defaulting to $productionDefault")
         productionDefault
-      }
     }
 
   private def getEnvironmentPath(file: String) =
@@ -86,7 +81,7 @@ class PdfGeneratorService @Inject()(
     Logger.debug(s"\n\nPROD_ROOT: $PROD_ROOT \nCONFIG_KEY: $CONFIG_KEY \nBASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE " +
       s"\nGS_ALIAS: $GS_ALIAS \nBASE_DIR: $BASE_DIR \nCONF_DIR: $CONF_DIR \nWK_TO_HTML_EXECUABLE: $WK_TO_HTML_EXECUTABLE " +
       s"\nPS_DEF: $BARE_PS_DEF_FILE \nADOBE_COLOR_PROFILE: $ADOBE_COLOR_PROFILE \nPDFA_CONF: $PS_DEF_FILE_FULL_PATH \nICC_CONF: " +
-      s"$ADOBE_COLOR_PROFILE_FULL_PATH\n Diskspace: ${PdfGeneratorMetric.gauge.getValue}Mb")
+      s"$ADOBE_COLOR_PROFILE_FULL_PATH")
   }
 
   def init(): Unit = {
@@ -119,7 +114,7 @@ class PdfGeneratorService @Inject()(
     } finally { if (!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
   }
 
-  private def deleteFile(fileName: String) = {
+  private def deleteFile(fileName: String): AnyVal = {
     val file = new File(BASE_DIR + fileName)
     if (file.exists()) {
       file.delete()
