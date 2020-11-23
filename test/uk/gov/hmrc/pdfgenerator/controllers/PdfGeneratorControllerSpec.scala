@@ -2,27 +2,36 @@ package uk.gov.hmrc.pdfgenerator.controllers
 
 import java.io.File
 
-import com.typesafe.config.{Config, ConfigFactory}
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import play.api.{Configuration, Environment}
+import org.scalatest.mockito.MockitoSugar.mock
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
-import uk.gov.hmrc.pdfgenerator.service.{PdfGeneratorService, ResourceHelper}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import com.kenshoo.play.metrics.PlayModule
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.resources._
+import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.util.Try
 
-class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with ScalaFutures {
+class PdfGeneratorControllerSpec extends UnitSpec with GuiceOneAppPerTest with ScalaFutures with MockitoSugar {
 
-  override def bindModules = Seq(new PlayModule)
+  val mockMetric = mock[PdfGeneratorMetric]
+
+  val pdfGeneratorController = new PdfGeneratorController(
+    new MockPdfGeneratorService(configuration),
+    stubControllerComponents(),
+    mockMetric
+  )
+
+  when(mockMetric.startTimer()).thenReturn(1L)
 
   "POST /generate" should {
     "create pdf from a String of html sent in as a form element" in {
-      val pdfGeneratorController = new PdfGeneratorController(new MockPdfGeneratorService(configuration))
-
       val request = FakeRequest("POST", "/generate")
         .withFormUrlEncodedBody(
           "html" -> "<h1>Some html header</h1>"
@@ -37,8 +46,6 @@ class PdfGeneratorControllerSpec extends UnitSpec with WithFakeApplication with 
 
   "POST /generate" should {
     "return an error if the html form element is not present" in {
-      val pdfGeneratorController = new PdfGeneratorController(new MockPdfGeneratorService(configuration))
-
       val request = FakeRequest("POST", "/generate")
         .withFormUrlEncodedBody()
 

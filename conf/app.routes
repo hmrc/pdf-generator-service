@@ -1,4 +1,4 @@
 # microservice specific routes
 
-POST       /generate      @uk.gov.hmrc.pdfgenerator.controllers.PdfGeneratorController.generate
-GET        /healthcheck   @uk.gov.hmrc.pdfgenerator.controllers.HealthCheckController.health
+POST       /generate      uk.gov.hmrc.pdfgenerator.controllers.PdfGeneratorController.generate
+GET        /healthcheck   uk.gov.hmrc.pdfgenerator.controllers.HealthCheckController.health
