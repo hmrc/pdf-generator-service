@@ -57,6 +57,7 @@ trait MicroService {
 
         extraDir.mkdir()
         binDir.mkdir()
+        println(s"Made dir: ${binDir}")
 
         import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -76,14 +77,14 @@ trait MicroService {
 
         val ghostscript = new File(tempDir, "ghostscript.tgz")
         download(s"https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/master/ghostscript-9.20-linux-x86_64.tgz", ghostscript)
-        s"tar zxf ${tempDir + ghostscript.getName} -C ./target/extra/bin/ --strip-components 1".!
-        s"chmod +x ./target/extra/bin/gs-920-linux_x86_64".!
+        s"tar zxf ${tempDir + ghostscript.getName} -C ${binDir}/ --strip-components 1".!
+        s"chmod +x ${binDir}/gs-920-linux_x86_64".!
         ghostscript.delete()
 
         val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
         download("https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/master/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz", wkhtmltox)
-        s"tar xJf ${tempDir + wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
-        s"chmod +x ./target/extra/bin/wkhtmltopdf".!
+        s"tar xJf ${tempDir + wkhtmltox.getName} -C ${extraDir}/ --strip-components 1".!
+        s"chmod +x ${extraDir}/bin/wkhtmltopdf".!
         wkhtmltox.delete()
       },
       mappings in Universal ++= contentOf(target.value / "extra"),
