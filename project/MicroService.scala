@@ -7,6 +7,7 @@ import com.typesafe.sbt.SbtNativePackager._
 
 import sbt.ModuleID
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtOnCompile
+import scala.concurrent.Await
 
 trait MicroService {
 
@@ -52,17 +53,35 @@ trait MicroService {
         val extraDir = target.value / "extra"
         val binDir: File = extraDir / "bin"
 
+        val githubToken = sys.env.getOrElse("GITHUB_API_TOKEN", sys.error("env var GITHUB_API_TOKEN is required"))
+
         extraDir.mkdir()
         binDir.mkdir()
 
+        import scala.concurrent.ExecutionContext.Implicits.global
+
+        def download(url: String, target: File) = {
+          import scala.concurrent.duration.DurationLong
+          val req = dispatch.url(url).GET.addHeader("Authorization", s"Token $githubToken")
+          Await.result(
+            dispatch.Http(req)
+              .map { res =>
+                if (res.getStatusCode != 200)
+                  sys.error(s"Failed to download $url statusCode ${res.getStatusCode}")
+                java.nio.file.Files.write(target.toPath, res.getResponseBodyAsBytes)
+              },
+            1.minute
+          )
+        }
+
         val ghostscript = new File(tempDir, "ghostscript.tgz")
-        IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/ghostscript/ghostscript-9.20-linux-x86_64.tgz"), ghostscript)
+        download(s"https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/master/ghostscript-9.20-linux-x86_64.tgz", ghostscript)
         s"tar zxf ${tempDir + ghostscript.getName} -C ./target/extra/bin/ --strip-components 1".!
         s"chmod +x ./target/extra/bin/gs-920-linux_x86_64".!
         ghostscript.delete()
 
         val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
-        IO.download(new URL("https://dl.bintray.com/hmrc/releases/uk/gov/hmrc/wkhtmltox/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz"), wkhtmltox)
+        download("https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/master/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz", wkhtmltox)
         s"tar xJf ${tempDir + wkhtmltox.getName} -C ./target/extra/ --strip-components 1".!
         s"chmod +x ./target/extra/bin/wkhtmltopdf".!
         wkhtmltox.delete()
@@ -77,7 +96,6 @@ trait MicroService {
       testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
       parallelExecution in IntegrationTest := false)
     .settings(
-      resolvers += Resolver.bintrayRepo("hmrc", "releases"),
       resolvers += Resolver.jcenterRepo
     )
     .settings(
