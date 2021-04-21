@@ -57,6 +57,11 @@ trait MicroService {
 
         extraDir.mkdir()
         binDir.mkdir()
+        println(s"Made dir: ${binDir} (${binDir.getAbsolutePath})")
+        println("\npwd: ")
+        "pwd".!
+        println(s"""\nls -la "${binDir.getAbsolutePath}":""")
+        Process(Seq("ls", "-la", binDir.getAbsolutePath)).!
 
         import scala.concurrent.ExecutionContext.Implicits.global
 
