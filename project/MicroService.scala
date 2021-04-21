@@ -55,8 +55,8 @@ trait MicroService {
 
         val githubToken = sys.env.getOrElse("GITHUB_API_TOKEN", sys.error("env var GITHUB_API_TOKEN is required"))
 
-        extraDir.mkdir()
-        binDir.mkdir()
+        extraDir.mkdirs()
+        binDir.mkdirs()
         println(s"Made dir: ${binDir} (${binDir.getAbsolutePath})")
         println("\npwd: ")
         "pwd".!
