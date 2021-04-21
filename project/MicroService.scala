@@ -55,18 +55,8 @@ trait MicroService {
 
         val githubToken = sys.env.getOrElse("GITHUB_API_TOKEN", sys.error("env var GITHUB_API_TOKEN is required"))
 
-        extraDir.mkdirs()
-        binDir.mkdirs()
-        println(s"Made dir: ${binDir} (${binDir.getAbsolutePath})")
-        println("\npwd: ")
-        "pwd".!
-        println(s"""\nls -la "${binDir.getAbsolutePath}":""")
-        Process(Seq("ls", "-la", binDir.getAbsolutePath)).!
-
-        println(s"Try again..")
-        Process(Seq("mkdir", "-p", binDir.getAbsolutePath)).!
-        println(s"""\nls -la "${binDir.getAbsolutePath}":""")
-        Process(Seq("ls", "-la", binDir.getAbsolutePath)).!
+        Process(Seq("mkdir", "-p", extraDir.getAbsolutePath)).!!
+        Process(Seq("mkdir", "-p", binDir.getAbsolutePath)).!!
 
         import scala.concurrent.ExecutionContext.Implicits.global
 
