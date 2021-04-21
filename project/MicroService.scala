@@ -63,6 +63,11 @@ trait MicroService {
         println(s"""\nls -la "${binDir.getAbsolutePath}":""")
         Process(Seq("ls", "-la", binDir.getAbsolutePath)).!
 
+        println(s"Try again..")
+        Process(Seq("mkdir", "-p", binDir.getAbsolutePath)).!
+        println(s"""\nls -la "${binDir.getAbsolutePath}":""")
+        Process(Seq("ls", "-la", binDir.getAbsolutePath)).!
+
         import scala.concurrent.ExecutionContext.Implicits.global
 
         def download(url: String, target: File) = {
