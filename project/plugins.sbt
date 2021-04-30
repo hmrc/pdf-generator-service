@@ -4,7 +4,9 @@ resolvers += "HMRC Releases" at "https://dl.bintray.com/hmrc/releases"
 
 resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "1.13.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "2.14.0")
+
+libraryDependencies ++= Seq("net.databinder.dispatch" %% "dispatch-core" % "0.11.4")
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-git-versioning" % "1.15.0")
 

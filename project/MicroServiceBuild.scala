@@ -66,4 +66,3 @@ private object AppDependencies {
 
   def apply() = compile ++ Test() ++ IntegrationTest()
 }
-
