@@ -1,4 +1,4 @@
-# generate-pdf
+# pdf-generator-service
 
 ## Performance issues with PNG image files
 
@@ -69,7 +69,9 @@ sm --logs PDF_GENERATOR_SERVICE
 ```
 
 ## GitHub API Token
-You will need to generate a Personal Access Token (PAT) called `GITHUB_API_TOKEN` and store is a system variable by following the instructions on the [GitHub page](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+
+You will need to generate a Personal Access Token (PAT) called `GITHUB_API_TOKEN` and store is a system variable by 
+following the instructions on the [GitHub page](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
 
 ## License    
 
