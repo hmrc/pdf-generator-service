@@ -68,6 +68,9 @@ This command will bring up the logs of the pdf-generator-service:
 sm --logs PDF_GENERATOR_SERVICE
 ```
 
+## GitHub API Token
+You will need to generate a Personal Access Token (PAT) called `GITHUB_API_TOKEN` and store is a system variable by following the instructions on the [GitHub page](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token).
+
 ## License    
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
