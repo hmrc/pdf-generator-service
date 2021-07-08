@@ -21,13 +21,12 @@ private object AppDependencies {
   private val playReactivemongoVersion = "6.4.0"
 
   val compile = Seq(
-    "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
+    "org.reactivemongo" %% "play2-reactivemongo"  % "0.18.8-play26",
     "org.jsoup"   %  "jsoup"              % "1.10.2",
 
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-26" % microserviceBootstrapVersion,
-    "uk.gov.hmrc" %% "auth-client" % authClientVersion,
-    "uk.gov.hmrc" %% "domain" % domainVersion,
+    "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "5.7.0",
+    "uk.gov.hmrc" %% "domain" % "5.10.0-play-26",
     "io.github.cloudify" %% "spdf" % "1.3.1"
   )
 
@@ -40,7 +39,7 @@ private object AppDependencies {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "org.mockito" % "mockito-core" % "3.3.3" % scope,
@@ -59,7 +58,7 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope
+        "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope
       )
     }.test
   }
