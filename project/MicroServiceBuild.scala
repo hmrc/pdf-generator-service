@@ -11,14 +11,9 @@ private object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  private val microserviceBootstrapVersion = "1.9.0"
-  private val authClientVersion = "2.19.0-play-26"
-  private val domainVersion = "5.3.0"
   private val hmrcTestVersion = "3.9.0-play-26"
   private val scalaTestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
-
-  private val playReactivemongoVersion = "6.4.0"
 
   val compile = Seq(
     "org.reactivemongo" %% "play2-reactivemongo"  % "0.18.8-play26",
@@ -27,7 +22,7 @@ private object AppDependencies {
     ws,
     "uk.gov.hmrc" %% "bootstrap-backend-play-26" % "5.7.0",
     "uk.gov.hmrc" %% "domain" % "5.10.0-play-26",
-    "io.github.cloudify" %% "spdf" % "1.3.1"
+    "io.github.cloudify" %% "spdf" % "1.4.0"
   )
 
   trait TestDependencies {

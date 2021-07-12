@@ -21,7 +21,7 @@ import java.io.{File, IOException}
 import com.codahale.metrics.SharedMetricRegistries
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.Status
 import play.api.test.FakeRequest
