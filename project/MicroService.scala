@@ -37,6 +37,7 @@ trait MicroService {
     .settings(publishingSettings: _*)
     .settings(majorVersion := 1)
     .settings(defaultSettings(): _*)
+    .settings(scalaVersion := "2.12.13")
     .settings(
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
