@@ -16,16 +16,13 @@
 
 package uk.gov.hmrc.pdfgenerator.controllers
 
-import java.io.File
-
 import javax.inject.Inject
-
 import scala.util.Failure
 import play.api.mvc._
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
@@ -34,12 +31,12 @@ class PdfGeneratorController @Inject()(
   val pdfGeneratorService: PdfGeneratorService,
   cc: ControllerComponents,
   pdfGeneratorMetric: PdfGeneratorMetric)
-    extends BackendController(cc) with HtmlSupport {
+    extends BackendController(cc) with HtmlSupport with Logging {
 
   implicit val ec: ExecutionContext = cc.executionContext
 
   def generate: Action[AnyContent] = Action.async { implicit request =>
-    Logger.debug("******* Generating PDF ***********")
+    logger.debug("******* Generating PDF ***********")
 
     val start = pdfGeneratorMetric.startTimer()
 

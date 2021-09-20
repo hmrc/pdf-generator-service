@@ -23,8 +23,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.{Configuration, Environment, Logger, Mode}
-import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
+import play.api.{Configuration, Environment, Logging, Mode}
 
 import scala.collection.JavaConverters._
 import scala.sys.process._
@@ -34,7 +33,8 @@ import scala.util.{Failure, Success, Try}
 class PdfGeneratorService @Inject()(
   configuration: Configuration,
   resourceHelper: ResourceHelper,
-  environment: Environment) {
+  environment: Environment)
+    extends Logging {
 
   val EMPTY_INDICATOR = "EMPTY_FOR_PROD_DEFAULT"
   val PROD_ROOT = "/app/"
@@ -52,7 +52,7 @@ class PdfGeneratorService @Inject()(
 
   private def default(configuration: Configuration, key: String, productionDefault: String): String =
     Try[String] {
-      val value = configuration.getString(CONFIG_KEY + key).getOrElse(productionDefault)
+      val value: String = configuration.getOptional[String](CONFIG_KEY + key).getOrElse(productionDefault)
       environment.mode match {
         case Mode.Prod => productionDefault
         case Mode.Test => productionDefault
@@ -87,21 +87,21 @@ class PdfGeneratorService @Inject()(
 
   private def logConfig(): Unit = {
     val checkGSfile = new File(GS_ALIAS)
-    Logger.debug(
+    logger.debug(
       s"\n absolutePath: ${checkGSfile.getAbsolutePath} \n exists: ${checkGSfile.exists()} \n canExecute: ${checkGSfile.canExecute}")
 
     val checkWkfile = new File(WK_TO_HTML_EXECUTABLE)
-    Logger.debug(
+    logger.debug(
       s"\n absolutePath: ${checkWkfile.getAbsolutePath} \n exists: ${checkWkfile.exists()} \n canExecute: ${checkWkfile.canExecute}")
 
-    Logger.debug(s"\n\nPROD_ROOT: $PROD_ROOT \nCONFIG_KEY: $CONFIG_KEY \nBASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE " +
+    logger.debug(s"\n\nPROD_ROOT: $PROD_ROOT \nCONFIG_KEY: $CONFIG_KEY \nBASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE " +
       s"\nGS_ALIAS: $GS_ALIAS \nBASE_DIR: $BASE_DIR \nCONF_DIR: $CONF_DIR \nWK_TO_HTML_EXECUABLE: $WK_TO_HTML_EXECUTABLE " +
       s"\nPS_DEF: $BARE_PS_DEF_FILE \nADOBE_COLOR_PROFILE: $ADOBE_COLOR_PROFILE \nPDFA_CONF: $PS_DEF_FILE_FULL_PATH \nICC_CONF: " +
       s"$ADOBE_COLOR_PROFILE_FULL_PATH")
   }
 
   def init(): Unit = {
-    Logger.info("Initialising PdfGeneratorService")
+    logger.info("Initialising PdfGeneratorService")
 
     resourceHelper.setupExecutableSupportFiles(
       BARE_PS_DEF_FILE,
@@ -115,7 +115,7 @@ class PdfGeneratorService @Inject()(
     logConfig()
     val inputFileName: String = UUID.randomUUID.toString + ".pdf"
     val outputFileName: String = UUID.randomUUID.toString + ".pdf"
-    Logger.trace(s"generatePdf from $html")
+    logger.trace(s"generatePdf from $html")
     val linksDisabled = if (forcePdfA) true else getLinksDisabled(html)
 
     try {
@@ -124,7 +124,7 @@ class PdfGeneratorService @Inject()(
       if (linksDisabled) {
         triedFile.flatMap(_ => convertToPdfA(getBaseDir + inputFileName, getBaseDir + outputFileName))
       } else {
-        Logger.warn("*** Generated PDF will not be PDF/A compliant as it contains valid gov.uk links ***")
+        logger.warn("*** Generated PDF will not be PDF/A compliant as it contains valid gov.uk links ***")
         triedFile
       }
     } finally { if (!linksDisabled) deleteFile(BASE_DIR + inputFileName) }
@@ -145,7 +145,7 @@ class PdfGeneratorService @Inject()(
   def getLinksDisabled(html: String): Boolean = {
     val startTime = System.currentTimeMillis()
     val links = extractLinksFromHtml(html)
-    Logger.trace("Checking document for links took " + (System.currentTimeMillis() - startTime) + " milliseconds")
+    logger.trace("Checking document for links took " + (System.currentTimeMillis() - startTime) + " milliseconds")
     if (onlyContainsValidLinks(links)) false else true
   }
 
@@ -159,7 +159,7 @@ class PdfGeneratorService @Inject()(
   private def validateDomain(domain: String): Boolean =
     if (domain.endsWith("gov.uk") || domain.endsWith("localhost")) true
     else {
-      Logger.warn(s"External link to $domain detected. All links in document will be disabled")
+      logger.warn(s"External link to $domain detected. All links in document will be disabled")
       false
     }
 
@@ -167,7 +167,7 @@ class PdfGeneratorService @Inject()(
     parseUrl(linkText) match {
       case Success(url) => validateDomain(url.getHost)
       case Failure(e) =>
-        Logger.error(s"Unable to parse link $linkText text as URL due to " + e.getMessage)
+        logger.error(s"Unable to parse link $linkText text as URL due to " + e.getMessage)
         false
     }
 
@@ -213,7 +213,7 @@ class PdfGeneratorService @Inject()(
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
 
-    Logger.info(s"generateCompliantPdfA inputFileName: $inputFileName outputFileName: $outputFileName")
+    logger.info(s"generateCompliantPdfA inputFileName: $inputFileName outputFileName: $outputFileName")
 
     val commands: Seq[String] = List(
       GS_ALIAS,
@@ -229,7 +229,7 @@ class PdfGeneratorService @Inject()(
       inputFileName
     )
 
-    Logger.debug(s"Running: ${commands.mkString(" ")}")
+    logger.debug(s"Running: ${commands.mkString(" ")}")
 
     Try {
       val exitCode = Process(commands).!
