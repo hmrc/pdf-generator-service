@@ -41,7 +41,7 @@ class PdfGeneratorService @Inject()(
   val CONFIG_KEY = "pdfGeneratorService."
 
   // From application.conf or environment specific
-  val BASE_DIR_DEV_MODE: Boolean = configuration.getBoolean(CONFIG_KEY + "baseDirDevMode").getOrElse(false)
+  val BASE_DIR_DEV_MODE: Boolean = configuration.getOptional[Boolean](CONFIG_KEY + "baseDirDevMode").getOrElse(false)
 
   def getBaseDir: String =
     if (BASE_DIR_DEV_MODE) {
@@ -61,7 +61,7 @@ class PdfGeneratorService @Inject()(
     } match {
       case Success(value) => value
       case Failure(_) =>
-        Logger.error(s"Failed to find a value for $key defaulting to $productionDefault")
+        logger.error(s"Failed to find a value for $key defaulting to $productionDefault")
         productionDefault
     }
 
