@@ -7,10 +7,10 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    "org.reactivemongo"  %% "play2-reactivemongo"       % "0.18.8-play26",
-    "org.jsoup"           %  "jsoup"                    % "1.10.2",
+    "org.reactivemongo"  %% "play2-reactivemongo"       % "1.0.7-play28",
+    "org.jsoup"           %  "jsoup"                    % "1.14.2",
     "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "5.12.0",
-    "uk.gov.hmrc"        %% "domain"                    % "5.10.0-play-26",
+    "uk.gov.hmrc"        %% "domain"                    % "6.2.0-play-28",
     "io.github.cloudify" %% "spdf"                      % "1.4.0"
   )
 
