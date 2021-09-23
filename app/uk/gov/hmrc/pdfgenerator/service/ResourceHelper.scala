@@ -18,7 +18,7 @@ package uk.gov.hmrc.pdfgenerator.service
 
 import java.io._
 
-import play.api.Logger
+import play.api.Logging
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
@@ -27,7 +27,7 @@ object ResourceHelper {
   def apply: ResourceHelper = new ResourceHelper()
 }
 
-class ResourceHelper {
+class ResourceHelper extends Logging {
 
   val failureMessage = "Generation of pdfs will most likely fail!"
 
@@ -40,7 +40,7 @@ class ResourceHelper {
 
     def replace(line: String): String = line.replace("$COLOUR_PROFILE$", colorProfileFullPath)
 
-    Logger.debug(s"Filtering pdf ${baserDir}conf/$psDefFileBare")
+    logger.debug(s"Filtering pdf ${baserDir}conf/$psDefFileBare")
     val source = Source fromFile baserDir + "conf/" + psDefFileBare
     val lines = source.getLines
     val result = lines.map(line => replace(line))
@@ -51,7 +51,7 @@ class ResourceHelper {
     bw.write(result.mkString("\n"))
 
     if (!file.exists) {
-      Logger.error(s"$psDefFileFullPath does not exist! $failureMessage")
+      logger.error(s"$psDefFileFullPath does not exist! $failureMessage")
     }
 
     bw.close()
@@ -63,7 +63,7 @@ class ResourceHelper {
 
   private def copyFileAsBytes(sourceFile: String, destinationFile: String): Unit =
     if (!new File(destinationFile).exists) {
-      Logger.debug(s"Byte Copying $sourceFile to $destinationFile")
+      logger.debug(s"Byte Copying $sourceFile to $destinationFile")
       val bytes = reader("/" + sourceFile)
       writer(destinationFile, bytes)
     }
@@ -72,7 +72,7 @@ class ResourceHelper {
     val bis = new BufferedInputStream(getClass.getResourceAsStream(filename))
     val triedByteArray = Try(Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray)
     bis.close()
-    Logger.info(s"reading bytes for $filename : successful = ${triedByteArray.isSuccess}")
+    logger.info(s"reading bytes for $filename : successful = ${triedByteArray.isSuccess}")
     triedByteArray
   }
 
@@ -82,9 +82,9 @@ class ResourceHelper {
     bos.close()
 
     tried match {
-      case Success(t) => Logger.info(s"Successfully wrote $filename")
+      case Success(t) => logger.info(s"Successfully wrote $filename")
       case Failure(e) => {
-        Logger.error(s"Failed to write bytes for $filename error was ${e.getMessage}, ")
+        logger.error(s"Failed to write bytes for $filename error was ${e.getMessage}, ")
       }
     }
   }

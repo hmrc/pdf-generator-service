@@ -1,11 +1,10 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.File
-
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.{Configuration, Environment, Mode}
-import uk.gov.hmrc.play.test.WithFakeApplication
 
 import scala.util.Success
 
@@ -17,7 +16,7 @@ object PdfGeneratorServiceIntegrationFixture {
   def enableLinksTrue: Boolean = true
 }
 
-class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with WithFakeApplication{
+class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
 
 
   val testConfig = new Configuration(ConfigFactory.load())

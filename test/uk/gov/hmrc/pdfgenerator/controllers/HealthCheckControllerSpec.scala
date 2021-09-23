@@ -17,22 +17,19 @@
 package uk.gov.hmrc.pdfgenerator.controllers
 
 import java.io.{File, IOException}
-
-import com.codahale.metrics.SharedMetricRegistries
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.pdfgenerator.utils.PdfGeneratorUnitSpec
 
 import scala.util.Try
 
-class HealthCheckControllerSpec extends UnitSpec with GuiceOneAppPerTest with ScalaFutures with MockitoSugar {
+class HealthCheckControllerSpec extends PdfGeneratorUnitSpec with GuiceOneAppPerTest with ScalaFutures {
 
   val mockPdfGeneratorService: PdfGeneratorService = mock[PdfGeneratorService]
   val mockMetric: PdfGeneratorMetric = mock[PdfGeneratorMetric]

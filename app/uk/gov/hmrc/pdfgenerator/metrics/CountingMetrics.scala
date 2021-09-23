@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit
 import com.codahale.metrics.Gauge
 import com.kenshoo.play.metrics.Metrics
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
+import play.api.Logging
 
 sealed protected trait Timer {
   val metrics: Metrics
@@ -77,8 +77,8 @@ sealed protected trait Connector {
   def status(code: Int): Unit = metrics.defaultRegistry.counter(s"$prefix-connector-status-$code").inc()
 }
 
-sealed trait PDFMetrics extends Timer with Connector with HealthCheckTimer {
-  Logger.info(s"[${super.getClass}][constructor] Initialising metrics interface")
+sealed trait PDFMetrics extends Timer with Connector with HealthCheckTimer with Logging {
+  logger.info(s"[${super.getClass}][constructor] Initialising metrics interface")
   val prefix: String
 }
 
@@ -98,7 +98,8 @@ sealed abstract class BasePdfGeneratorMetric(name: String) extends PDFMetrics {
 }
 
 @Singleton
-class PdfGeneratorMetric @Inject()(val metrics: Metrics) extends BasePdfGeneratorMetric("pdf-generator-service") {
+class PdfGeneratorMetric @Inject()(val metrics: Metrics)
+    extends BasePdfGeneratorMetric("pdf-generator-service") with Logging {
 
   lazy val gauge = new DiskSpaceGuage()
 
@@ -113,11 +114,11 @@ class PdfGeneratorMetric @Inject()(val metrics: Metrics) extends BasePdfGenerato
     override def getValue: Int =
       try {
         val freeSpace = Math.toIntExact(measureFile.getFreeSpace / ONE_MILLION)
-        Logger.debug(s"Getting free diskspace ${freeSpace}Mb")
+        logger.debug(s"Getting free diskspace ${freeSpace}Mb")
         freeSpace
       } catch {
         case e => {
-          Logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}")
+          logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}")
           -1
         }
       }

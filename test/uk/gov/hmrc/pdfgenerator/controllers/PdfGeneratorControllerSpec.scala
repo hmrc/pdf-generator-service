@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.pdfgenerator.controllers
 
-import java.io.File
-
 import org.mockito.Mockito.when
+
+import java.io.File
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar.mock
-import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.Status
 import play.api.test.FakeRequest
@@ -30,13 +28,13 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.resources._
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.pdfgenerator.utils.PdfGeneratorUnitSpec
 
 import scala.util.Try
 
-class PdfGeneratorControllerSpec extends UnitSpec with GuiceOneAppPerTest with ScalaFutures with MockitoSugar {
+class PdfGeneratorControllerSpec extends PdfGeneratorUnitSpec with GuiceOneAppPerTest with ScalaFutures {
 
-  val mockMetric = mock[PdfGeneratorMetric]
+  val mockMetric: PdfGeneratorMetric = mock[PdfGeneratorMetric]
 
   val pdfGeneratorController = new PdfGeneratorController(
     new MockPdfGeneratorService(configuration),
