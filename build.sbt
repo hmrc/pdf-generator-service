@@ -79,7 +79,7 @@ lazy val microservice = Project(appName, file("."))
       println("Downloading GhostScript...")
       val ghostscript = new File(tempDir, "ghostscript.tgz")
       download(
-        s"https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/master/ghostscript-9.20-linux-x86_64.tgz",
+        s"https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/main/ghostscript-9.20-linux-x86_64.tgz",
         ghostscript)
       println(s"Extracting GhostScript to ${binDir.getAbsolutePath}/gs-920-linux_x86_64")
       Process(Seq("tar", "zxf", tempDir + ghostscript.getName, "-C", binDir.getAbsolutePath, "--strip-components", "1")).!!
@@ -89,7 +89,7 @@ lazy val microservice = Project(appName, file("."))
       println("Downloading wkhtmltopdf...")
       val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
       download(
-        "https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/master/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz",
+        "https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/main/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz",
         wkhtmltox)
       println(s"Extracting wkhtmltopdf to ${extraDir.getAbsolutePath}/bin/wkhtmltopdf")
       Process(Seq("tar", "xJf", tempDir + wkhtmltox.getName, "-C", extraDir.getAbsolutePath, "--strip-components", "1")).!!
