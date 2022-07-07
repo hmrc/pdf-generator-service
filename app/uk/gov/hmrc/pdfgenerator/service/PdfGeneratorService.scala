@@ -87,14 +87,14 @@ class PdfGeneratorService @Inject()(
 
   private def logConfig(): Unit = {
     val checkGSfile = new File(GS_ALIAS)
-    logger.debug(
+    logger.info(
       s"\n absolutePath: ${checkGSfile.getAbsolutePath} \n exists: ${checkGSfile.exists()} \n canExecute: ${checkGSfile.canExecute}")
 
     val checkWkfile = new File(WK_TO_HTML_EXECUTABLE)
-    logger.debug(
+    logger.info(
       s"\n absolutePath: ${checkWkfile.getAbsolutePath} \n exists: ${checkWkfile.exists()} \n canExecute: ${checkWkfile.canExecute}")
 
-    logger.debug(s"\n\nPROD_ROOT: $PROD_ROOT \nCONFIG_KEY: $CONFIG_KEY \nBASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE " +
+    logger.info(s"\n\nPROD_ROOT: $PROD_ROOT \nCONFIG_KEY: $CONFIG_KEY \nBASE_DIR_DEV_MODE: $BASE_DIR_DEV_MODE " +
       s"\nGS_ALIAS: $GS_ALIAS \nBASE_DIR: $BASE_DIR \nCONF_DIR: $CONF_DIR \nWK_TO_HTML_EXECUABLE: $WK_TO_HTML_EXECUTABLE " +
       s"\nPS_DEF: $BARE_PS_DEF_FILE \nADOBE_COLOR_PROFILE: $ADOBE_COLOR_PROFILE \nPDFA_CONF: $PS_DEF_FILE_FULL_PATH \nICC_CONF: " +
       s"$ADOBE_COLOR_PROFILE_FULL_PATH")
@@ -229,7 +229,7 @@ class PdfGeneratorService @Inject()(
       inputFileName
     )
 
-    logger.debug(s"Running: ${commands.mkString(" ")}")
+    logger.info(s"Running: ${commands.mkString(" ")}")
 
     Try {
       val exitCode = Process(commands).!
