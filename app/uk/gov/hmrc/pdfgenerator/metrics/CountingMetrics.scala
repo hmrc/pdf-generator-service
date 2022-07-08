@@ -114,7 +114,7 @@ class PdfGeneratorMetric @Inject()(val metrics: Metrics)
     override def getValue: Int =
       try {
         val freeSpace = Math.toIntExact(measureFile.getFreeSpace / ONE_MILLION)
-        logger.debug(s"Getting free diskspace ${freeSpace}Mb")
+        logger.info(s"Getting free diskspace ${freeSpace}Mb")
         freeSpace
       } catch {
         case e => {

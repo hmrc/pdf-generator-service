@@ -36,7 +36,7 @@ class PdfGeneratorController @Inject()(
   implicit val ec: ExecutionContext = cc.executionContext
 
   def generate: Action[AnyContent] = Action.async { implicit request =>
-    logger.debug("******* Generating PDF ***********")
+    logger.info("******* Generating PDF ***********")
 
     val start = pdfGeneratorMetric.startTimer()
 

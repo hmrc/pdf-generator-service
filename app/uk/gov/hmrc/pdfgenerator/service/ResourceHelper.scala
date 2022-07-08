@@ -40,7 +40,7 @@ class ResourceHelper extends Logging {
 
     def replace(line: String): String = line.replace("$COLOUR_PROFILE$", colorProfileFullPath)
 
-    logger.debug(s"Filtering pdf ${baserDir}conf/$psDefFileBare")
+    logger.info(s"Filtering pdf ${baserDir}conf/$psDefFileBare")
     val source = Source fromFile baserDir + "conf/" + psDefFileBare
     val lines = source.getLines
     val result = lines.map(line => replace(line))
@@ -63,7 +63,7 @@ class ResourceHelper extends Logging {
 
   private def copyFileAsBytes(sourceFile: String, destinationFile: String): Unit =
     if (!new File(destinationFile).exists) {
-      logger.debug(s"Byte Copying $sourceFile to $destinationFile")
+      logger.info(s"Byte Copying $sourceFile to $destinationFile")
       val bytes = reader("/" + sourceFile)
       writer(destinationFile, bytes)
     }
