@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ class PdfGeneratorMetric @Inject()(val metrics: Metrics)
         logger.info(s"Getting free diskspace ${freeSpace}Mb")
         freeSpace
       } catch {
-        case e => {
+        case e: Throwable => {
           logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}")
           -1
         }
