@@ -17,11 +17,12 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import com.typesafe.config.ConfigFactory
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.pdfgenerator.resources._
 
-class PdfGeneratorServiceSpec extends WordSpec with MustMatchers {
+class PdfGeneratorServiceSpec extends AnyWordSpec with Matchers {
 
   val testConfig = new Configuration(ConfigFactory.load("test-application.conf"))
   val service = new PdfGeneratorService(testConfig, MockResourceHelper, Environment.simple())

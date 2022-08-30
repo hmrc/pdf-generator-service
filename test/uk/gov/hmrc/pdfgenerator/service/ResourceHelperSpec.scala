@@ -18,14 +18,15 @@ package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.File
 
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.io.Source
 
 /**
   * Created by peter on 14/12/2016.
   */
-class ResourceHelperSpec extends WordSpec with MustMatchers {
+class ResourceHelperSpec extends AnyWordSpec with Matchers {
 
   private val localDir = new File(".").getCanonicalPath + "/"
 

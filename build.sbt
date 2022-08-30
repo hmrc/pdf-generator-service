@@ -62,8 +62,8 @@ lazy val microservice = Project(appName, file("."))
       def download(url: String, target: File) = {
         val req = dispatch.url(url).GET.addHeader("Authorization", s"Token $githubToken")
         Await.result(
-          dispatch
-            .Http(req)
+          dispatch.Http
+            .default(req)
             .map { res =>
               if (res.getStatusCode != 200)
                 sys.error(s"Failed to download $url statusCode ${res.getStatusCode}")

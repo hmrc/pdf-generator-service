@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.pdfgenerator.controllers
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
+class HtmlSupportSpec extends AnyFlatSpec with Matchers with HtmlSupport {
 
   val HTML = "<html><body><h1>Some Html</h1></body></html>"
 
