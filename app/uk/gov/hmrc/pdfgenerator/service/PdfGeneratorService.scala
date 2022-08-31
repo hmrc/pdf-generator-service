@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,6 @@ class PdfGeneratorService @Inject()(
     val outputFileName: String = UUID.randomUUID.toString + ".pdf"
     logger.trace(s"generatePdf from $html")
     val linksDisabled = if (forcePdfA) true else getLinksDisabled(html)
-
     try {
 
       val triedFile = generatePdfFromHtml(html, BASE_DIR + inputFileName, linksDisabled)

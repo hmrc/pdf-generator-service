@@ -1,8 +1,8 @@
 package uk.gov.hmrc.pdfgenerator.service
 
-import java.io.File
 import com.typesafe.config.ConfigFactory
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.{Configuration, Environment, Mode}
 
@@ -16,7 +16,7 @@ object PdfGeneratorServiceIntegrationFixture {
   def enableLinksTrue: Boolean = true
 }
 
-class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with GuiceOneAppPerTest {
+class PdfGeneratorServiceIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest {
 
 
   val testConfig = new Configuration(ConfigFactory.load())
@@ -27,11 +27,11 @@ class PdfGeneratorServiceIntegrationSpec extends WordSpec with MustMatchers with
   "A PdfGeneratorService" should {
     "generate a pdf without links" in {
       val triedFile = pdfGeneratorService.generatePdf(PdfGeneratorServiceIntegrationFixture.html, PdfGeneratorServiceIntegrationFixture.enableLinksFalse)
-      triedFile mustBe a[Success[File]]
+      triedFile shouldBe a[Success[_]]
     }
     "generate a pdf with links" in {
       val triedFile = pdfGeneratorService.generatePdf(PdfGeneratorServiceIntegrationFixture.html, PdfGeneratorServiceIntegrationFixture.enableLinksTrue)
-      triedFile mustBe a[Success[File]]
+      triedFile shouldBe a[Success[_]]
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.pdfgenerator.controllers
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class HtmlSupportSpec extends FlatSpec with Matchers with HtmlSupport {
+class HtmlSupportSpec extends AnyFlatSpec with Matchers with HtmlSupport {
 
   val HTML = "<html><body><h1>Some Html</h1></body></html>"
 

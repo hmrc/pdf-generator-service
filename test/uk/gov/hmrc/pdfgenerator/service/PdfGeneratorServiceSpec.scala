@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@
 package uk.gov.hmrc.pdfgenerator.service
 
 import com.typesafe.config.ConfigFactory
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.pdfgenerator.resources._
 
-class PdfGeneratorServiceSpec extends WordSpec with MustMatchers {
+class PdfGeneratorServiceSpec extends AnyWordSpec with Matchers {
 
   val testConfig = new Configuration(ConfigFactory.load("test-application.conf"))
   val service = new PdfGeneratorService(testConfig, MockResourceHelper, Environment.simple())

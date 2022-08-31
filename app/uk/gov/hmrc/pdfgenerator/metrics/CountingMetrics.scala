@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,11 +90,11 @@ sealed abstract class BasePdfGeneratorMetric(name: String) extends PDFMetrics {
 
   override val prefix = name
 
-  def count() = metrics.defaultRegistry.counter(s"$prefix-count").inc()
+  def count(): Unit = metrics.defaultRegistry.counter(s"$prefix-count").inc()
 
-  def successCount() = metrics.defaultRegistry.counter(s"$prefix-success-count").inc()
+  def successCount(): Unit = metrics.defaultRegistry.counter(s"$prefix-success-count").inc()
 
-  def failureCount() = metrics.defaultRegistry.counter(s"$prefix-failure-count").inc()
+  def failureCount(): Unit = metrics.defaultRegistry.counter(s"$prefix-failure-count").inc()
 }
 
 @Singleton
@@ -117,10 +117,9 @@ class PdfGeneratorMetric @Inject()(val metrics: Metrics)
         logger.info(s"Getting free diskspace ${freeSpace}Mb")
         freeSpace
       } catch {
-        case e => {
+        case e: Throwable =>
           logger.error(s"DiskSpaceGuage: Bad Disk Space value ${e.getMessage}")
           -1
-        }
       }
   }
 }

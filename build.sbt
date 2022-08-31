@@ -30,14 +30,14 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= AppDependencies.all,
     retrieveManaged := true,
     scalafmtOnCompile := true,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+    update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
+    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    parallelExecution in IntegrationTest := false
+    IntegrationTest / parallelExecution := false
   )
   .settings(
     resolvers += Resolver.jcenterRepo
@@ -62,8 +62,8 @@ lazy val microservice = Project(appName, file("."))
       def download(url: String, target: File) = {
         val req = dispatch.url(url).GET.addHeader("Authorization", s"Token $githubToken")
         Await.result(
-          dispatch
-            .Http(req)
+          dispatch.Http
+            .default(req)
             .map { res =>
               if (res.getStatusCode != 200)
                 sys.error(s"Failed to download $url statusCode ${res.getStatusCode}")
@@ -96,6 +96,6 @@ lazy val microservice = Project(appName, file("."))
       Process(Seq("chmod", "+x", s"${extraDir.getAbsolutePath}/bin/wkhtmltopdf")).!!
       wkhtmltox.delete()
     },
-    mappings in Universal ++= contentOf(target.value / "extra"),
+    Universal / mappings ++= contentOf(target.value / "extra"),
     update := (update dependsOn downloadBinaryDependencies).value
   )

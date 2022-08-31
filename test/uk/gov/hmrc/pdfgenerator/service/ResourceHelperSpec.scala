@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ package uk.gov.hmrc.pdfgenerator.service
 
 import java.io.File
 
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.io.Source
 
 /**
   * Created by peter on 14/12/2016.
   */
-class ResourceHelperSpec extends WordSpec with MustMatchers {
+class ResourceHelperSpec extends AnyWordSpec with Matchers {
 
   private val localDir = new File(".").getCanonicalPath + "/"
 
