@@ -98,7 +98,7 @@ lazy val microservice = Project(appName, file("."))
 lazy val scoverageSettings = {
   Seq(
     coverageExcludedPackages := "<empty>;app.*;config.*;metrics.*;testOnlyDoNotUseInAppConf.*;views.html.*;views.txt;uk.gov.hmrc.*;prod.*;definition.*;live.*;sandbox.*",
-    coverageMinimumStmtTotal := 77.90,
+    coverageMinimumStmtTotal := 100,
     coverageFailOnMinimum := true,
     coverageHighlighting := true
   )
