@@ -22,6 +22,7 @@ import play.api.Logging
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
+import scala.language.postfixOps
 
 object ResourceHelper {
   def apply: ResourceHelper = new ResourceHelper()
