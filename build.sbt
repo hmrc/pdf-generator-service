@@ -2,7 +2,6 @@ import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtOnCompi
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.executableFilesInTar
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import com.typesafe.sbt.packager.MappingsHelper.contentOf
-//import play.sbt.PlaySettings.defaultSettings
 
 val appName: String = "pdf-generator-service"
 lazy val downloadBinaryDependencies = taskKey[Unit]("downloadBinaryDependencies")
@@ -18,7 +17,6 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(plugins: _*)
   .settings(
     majorVersion := 1,
-//    defaultSettings(),
     scalaVersion := "2.12.13",
     scoverageSettings,
     libraryDependencies ++= AppDependencies.all,
