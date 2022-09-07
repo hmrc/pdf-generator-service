@@ -23,5 +23,5 @@ dist
 *.iws
 .DS_Store
 **/*.DS_Store
-
+.bloop
     
