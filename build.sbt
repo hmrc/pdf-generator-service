@@ -49,7 +49,9 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(
     scalacOptions ++= Seq(
-      "-P:silencer:pathFilters=routes,silencer:pathFilters=twirl",
+      "-feature",
+      "-Xfatal-warnings",
+      "-P:silencer:pathFilters=routes,silencer:pathFilters=twirl"
     ),
     libraryDependencies ++= Seq(
       compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
