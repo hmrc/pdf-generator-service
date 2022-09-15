@@ -21,7 +21,7 @@ object AppDependencies {
     "uk.gov.hmrc"            %% "bootstrap-test-play-28" % bootstrapVersion,
     "org.pegdown"             % "pegdown"                % pegdownVersion,
     "com.typesafe.play"      %% "play-test"              % PlayVersion.current,
-    "org.mockito"             % "mockito-core"           % "4.7.0",
+    "org.mockito"             % "mockito-core"           % "4.8.0",
     "org.apache.pdfbox"       % "pdfbox"                 % "2.0.26"
   ).map(_ % "test")
 
