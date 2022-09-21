@@ -1,15 +1,7 @@
-import sbt.Keys._
-import sbt._
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtOnCompile
-import uk.gov.hmrc._
-import DefaultBuildSettings.{addTestReportOption, defaultSettings}
-import sbt.io.Path.contentOf
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
-import uk.gov.hmrc.SbtArtifactory
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.executableFilesInTar
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
+import com.typesafe.sbt.packager.MappingsHelper.contentOf
 
 val appName: String = "pdf-generator-service"
 val silencerVersion = "1.7.8"
@@ -27,8 +19,8 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(plugins: _*)
   .settings(
     majorVersion := 1,
-    defaultSettings(),
     scalaVersion := "2.12.13",
+    scoverageSettings,
     libraryDependencies ++= AppDependencies.all,
     retrieveManaged := true,
     scalafmtOnCompile := true,
@@ -112,3 +104,13 @@ lazy val microservice = Project(appName, file("."))
     Universal / mappings ++= contentOf(target.value / "extra"),
     update := (update dependsOn downloadBinaryDependencies).value
   )
+
+// SCoverage
+lazy val scoverageSettings = {
+  Seq(
+    coverageExcludedPackages := "<empty>;app.*;prod.*;metrics.*;javascript.*;testOnlyDoNotUseInAppConf.*",
+    coverageMinimumStmtTotal := 50.92,
+    coverageFailOnMinimum := true,
+    coverageHighlighting := true
+  )
+}
