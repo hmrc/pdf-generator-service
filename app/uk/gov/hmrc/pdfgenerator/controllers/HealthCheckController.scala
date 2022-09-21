@@ -32,7 +32,7 @@ class HealthCheckController @Inject()(
   cc: ControllerComponents)
     extends BackendController(cc) with Logging {
 
-  def health: Action[AnyContent] = Action.async { implicit request =>
+  def health: Action[AnyContent] = Action.async { _ =>
     val timer = pdfGenMetric.startHealthCheckTimer()
     pdfGeneratorService.generatePdf("<p>health</p>", forcePdfA = true) match {
       case Success(file) =>
