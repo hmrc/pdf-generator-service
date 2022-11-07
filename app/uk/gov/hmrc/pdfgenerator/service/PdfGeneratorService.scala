@@ -211,7 +211,6 @@ class PdfGeneratorService @Inject()(
     }
 
   private def convertToPdfA(inputFileName: String, outputFileName: String): Try[File] = {
-
     logger.info(s"generateCompliantPdfA inputFileName: $inputFileName outputFileName: $outputFileName")
 
     val commands: Seq[String] = List(
