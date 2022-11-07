@@ -11,8 +11,7 @@ lazy val plugins: Seq[Plugins] = Seq(
   play.sbt.PlayScala,
   SbtAutoBuildPlugin,
   SbtGitVersioning,
-  SbtDistributablesPlugin,
-  SbtArtifactory
+  SbtDistributablesPlugin
 )
 
 lazy val microservice = Project(appName, file("."))
