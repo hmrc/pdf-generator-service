@@ -11,8 +11,7 @@ lazy val plugins: Seq[Plugins] = Seq(
   play.sbt.PlayScala,
   SbtAutoBuildPlugin,
   SbtGitVersioning,
-  SbtDistributablesPlugin,
-  SbtArtifactory
+  SbtDistributablesPlugin
 )
 
 lazy val microservice = Project(appName, file("."))
@@ -108,8 +107,8 @@ lazy val microservice = Project(appName, file("."))
 // SCoverage
 lazy val scoverageSettings = {
   Seq(
-    coverageExcludedPackages := "<empty>;app.*;prod.*;metrics.*;javascript.*;testOnlyDoNotUseInAppConf.*",
-    coverageMinimumStmtTotal := 50.92,
+    coverageExcludedPackages := "<empty>;app.*;prod.*;.*metrics.*;javascript.*;testOnlyDoNotUseInAppConf.*;.*service.*",
+    coverageMinimumStmtTotal := 86.30,
     coverageFailOnMinimum := true,
     coverageHighlighting := true
   )
