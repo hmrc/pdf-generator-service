@@ -1,4 +1,10 @@
-# pdf-generator-service
+# pdf-generator-service - DEPRECATED
+
+## There is no replacemrnt platform service provided at this time.
+
+There are 2 common approaches to generating PDFs:
+1. Use HTML to build a view, then turn that into a PDF. This is useful if the PDF you want to generate is a copy of a web page.
+2. Generate a PDF without using HTML as an intermediary. A PDF is very different to a web page, especially if you expect a user to print the PDF. And the PDF should have its own design consideration. In some cases the end user of the PDF may be an entirely different user to the one creating the PDF. In the case of print and post forms for example, the PDF needs to mostly work for the person processing the form.
 
 ## Performance issues with PNG image files
 
