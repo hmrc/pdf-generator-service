@@ -43,7 +43,7 @@ class ResourceHelper extends Logging {
 
     logger.info(s"Filtering pdf ${baserDir}conf/$psDefFileBare")
     val source = Source fromFile baserDir + "conf/" + psDefFileBare
-    val lines = source.getLines
+    val lines = source.getLines()
     val result = lines.map(line => replace(line))
 
     val file = new File(psDefFileFullPath)
@@ -71,7 +71,7 @@ class ResourceHelper extends Logging {
 
   private def reader(filename: String): Try[Array[Byte]] = {
     val bis = new BufferedInputStream(getClass.getResourceAsStream(filename))
-    val triedByteArray = Try(Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray)
+    val triedByteArray = Try(LazyList.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray)
     bis.close()
     logger.info(s"reading bytes for $filename : successful = ${triedByteArray.isSuccess}")
     triedByteArray
@@ -79,7 +79,7 @@ class ResourceHelper extends Logging {
 
   private def writer(filename: String, byteArray: Try[Array[Byte]]) = {
     val bos = new BufferedOutputStream(new FileOutputStream(filename))
-    val tried = byteArray.map(byteArray => Stream.continually(bos.write(byteArray)))
+    val tried = byteArray.map(byteArray => LazyList.continually(bos.write(byteArray)))
     bos.close()
 
     tried match {

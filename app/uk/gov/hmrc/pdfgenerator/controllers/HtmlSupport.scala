@@ -41,7 +41,7 @@ trait HtmlSupport {
 
   val noScriptTags: Constraint[String] = noScriptTags()
 
-  val html: Mapping[String] = text verifying (Constraints.nonEmpty, noScriptTags)
+  val html: Mapping[String] = text.verifying(Constraints.nonEmpty, noScriptTags)
 
   case class PdfForm(html: String, forcePdfA: Boolean)
 

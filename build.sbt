@@ -4,7 +4,6 @@ import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import com.typesafe.sbt.packager.MappingsHelper.contentOf
 
 val appName: String = "pdf-generator-service"
-val silencerVersion = "1.7.8"
 
 lazy val downloadBinaryDependencies = taskKey[Unit]("downloadBinaryDependencies")
 lazy val plugins: Seq[Plugins] = Seq(
@@ -18,7 +17,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(plugins: _*)
   .settings(
     majorVersion := 1,
-    scalaVersion := "2.12.13",
+    scalaVersion := "2.13.8",
     scoverageSettings,
     libraryDependencies ++= AppDependencies.all,
     retrieveManaged := true,
@@ -41,12 +40,12 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalacOptions ++= Seq(
       "-feature",
-      "-Xfatal-warnings",
-      "-P:silencer:pathFilters=routes,silencer:pathFilters=twirl"
-    ),
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+      "-Werror",
+      "-Wconf:cat=unused-imports&site=<empty>:s",
+      "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
+      "-Wconf:cat=unused&src=.*Routes\\.scala:s",
+      "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s",
+      "-Wconf:cat=unused&src=.*JavaScriptReverseRoutes\\.scala:s"
     )
   )
   .settings(
