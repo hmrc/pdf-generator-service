@@ -24,8 +24,9 @@ import javax.inject.{Inject, Singleton}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.{Configuration, Environment, Logging, Mode}
+import uk.gov.hmrc.pdfgenerator.utils.{PdfConfig, Portrait}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.sys.process._
 import scala.util.{Failure, Success, Try}
 
@@ -175,8 +176,6 @@ class PdfGeneratorService @Inject()(
 
   private def generatePdfFromHtml(html: String, inputFileName: String, linksDisabled: Boolean): Try[File] = {
     import java.io._
-
-    import io.github.cloudify.scala.spdf._
 
     Try {
       val pdf: Pdf = Pdf(

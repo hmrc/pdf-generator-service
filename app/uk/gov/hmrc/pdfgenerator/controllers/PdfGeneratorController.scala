@@ -42,25 +42,27 @@ class PdfGeneratorController @Inject()(
 
     val pdfForm = getPdfForm()
 
-    pdfForm.bindFromRequest.fold(
-      badRequest => {
-        val errors =
-          badRequest.errors.map(formError => formError.key + " " + formError.messages.mkString(" ")).mkString(" : ")
-        Future.successful(BadRequest(errors))
-      },
-      pdf => {
-        pdfGeneratorService.generatePdf(pdf.html, pdf.forcePdfA) match {
-          case Success(file) =>
-            pdfGeneratorMetric.successCount()
-            pdfGeneratorMetric.endTimer(start)
-            Future.successful(Ok.sendFile(file, inline = false, onClose = () => file.delete()))
-          case Failure(e) =>
-            pdfGeneratorMetric.failureCount()
-            pdfGeneratorMetric.endTimer(start)
-            Future.successful(BadRequest(e.getMessage))
+    pdfForm
+      .bindFromRequest()
+      .fold(
+        badRequest => {
+          val errors =
+            badRequest.errors.map(formError => formError.key + " " + formError.messages.mkString(" ")).mkString(" : ")
+          Future.successful(BadRequest(errors))
+        },
+        pdf => {
+          pdfGeneratorService.generatePdf(pdf.html, pdf.forcePdfA) match {
+            case Success(file) =>
+              pdfGeneratorMetric.successCount()
+              pdfGeneratorMetric.endTimer(start)
+              Future.successful(Ok.sendFile(file, inline = false, onClose = () => file.delete()))
+            case Failure(e) =>
+              pdfGeneratorMetric.failureCount()
+              pdfGeneratorMetric.endTimer(start)
+              Future.successful(BadRequest(e.getMessage))
+          }
         }
-      }
-    )
+      )
   }
 
 }
