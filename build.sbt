@@ -2,6 +2,7 @@ import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtOnCompi
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.executableFilesInTar
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import com.typesafe.sbt.packager.MappingsHelper.contentOf
+import uk.gov.hmrc.DefaultBuildSettings
 
 val appName: String = "pdf-generator-service"
 
@@ -13,23 +14,19 @@ lazy val plugins: Seq[Plugins] = Seq(
   SbtDistributablesPlugin
 )
 
+ThisBuild / majorVersion := 1
+ThisBuild / scalaVersion := "2.13.12"
+
+val githubToken = sys.env.getOrElse("GITHUB_API_TOKEN", sys.error("env var GITHUB_API_TOKEN is required"))
+
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(plugins: _*)
+  .enablePlugins(plugins *)
   .settings(
-    majorVersion := 1,
-    scalaVersion := "2.13.10",
     scoverageSettings,
     libraryDependencies ++= AppDependencies.all,
     retrieveManaged := true,
     scalafmtOnCompile := true,
     update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
-  )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(
-    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / parallelExecution := false
   )
   .settings(
     resolvers += Resolver.jcenterRepo
@@ -54,13 +51,11 @@ lazy val microservice = Project(appName, file("."))
       import scala.concurrent.Await
       import scala.concurrent.ExecutionContext.Implicits.global
       import scala.concurrent.duration.DurationLong
-      import scala.sys.process._
+      import scala.sys.process.*
 
       val tempDir = "/tmp/"
       val extraDir = target.value / "extra"
       val binDir: File = extraDir / "bin"
-
-      val githubToken = sys.env.getOrElse("GITHUB_API_TOKEN", sys.error("env var GITHUB_API_TOKEN is required"))
 
       def download(url: String, target: File) = {
         val req = dispatch.url(url).GET.addHeader("Authorization", s"Token $githubToken")
@@ -112,3 +107,13 @@ lazy val scoverageSettings = {
     coverageHighlighting := true
   )
 }
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(
+    DefaultBuildSettings.itSettings(),
+    libraryDependencies ++= AppDependencies.it,
+    addTestReportOption(Test, "int-test-reports"),
+    Test / parallelExecution := false
+  )
