@@ -1,7 +1,10 @@
-import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport.scalafmtOnCompile
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.executableFilesInTar
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import com.typesafe.sbt.packager.MappingsHelper.contentOf
+import java.io.File
+import java.nio.file.Files
+import jakarta.ws.rs.client.ClientBuilder
+import jakarta.ws.rs.core.Response
 
 val appName: String = "pdf-generator-service"
 
@@ -17,7 +20,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(plugins: _*)
   .settings(
     majorVersion := 1,
-    scalaVersion := "2.13.10",
+    scalaVersion := "3.3.7",
     scoverageSettings,
     libraryDependencies ++= AppDependencies.all,
     retrieveManaged := true,
@@ -41,11 +44,13 @@ lazy val microservice = Project(appName, file("."))
     scalacOptions ++= Seq(
       "-feature",
       "-Werror",
-      "-Wconf:cat=unused-imports&site=<empty>:s",
-      "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
-      "-Wconf:cat=unused&src=.*Routes\\.scala:s",
-      "-Wconf:cat=unused&src=.*ReverseRoutes\\.scala:s",
-      "-Wconf:cat=unused&src=.*JavaScriptReverseRoutes\\.scala:s"
+      "-Wconf:msg=unused import&src=.*views/.*:s",
+      "-Wconf:msg=unused import&src=<empty>:s",
+      "-Wconf:msg=unused&src=.*RoutesPrefix\\.scala:s",
+      "-Wconf:msg=unused&src=.*Routes\\.scala:s",
+      "-Wconf:msg=unused&src=.*ReverseRoutes\\.scala:s",
+      "-Wconf:msg=unused&src=.*JavaScriptReverseRoutes\\.scala:s",
+      "-Wconf:msg=Flag.*repeatedly:s"
     )
   )
   .settings(
@@ -62,18 +67,27 @@ lazy val microservice = Project(appName, file("."))
 
       val githubToken = sys.env.getOrElse("GITHUB_API_TOKEN", sys.error("env var GITHUB_API_TOKEN is required"))
 
-      def download(url: String, target: File) = {
-        val req = dispatch.url(url).GET.addHeader("Authorization", s"Token $githubToken")
-        Await.result(
-          dispatch.Http
-            .default(req)
-            .map { res =>
-              if (res.getStatusCode != 200)
-                sys.error(s"Failed to download $url statusCode ${res.getStatusCode}")
-              java.nio.file.Files.write(target.toPath, res.getResponseBodyAsBytes)
-            },
-          1.minute
-        )
+      def download(url: String, target: File): Unit = {
+        val client = ClientBuilder.newClient()
+
+        val response: Response =
+          client
+            .target(url)
+            .request()
+            .header("Authorization", s"Token $githubToken")
+            .get()
+
+        try {
+          if (response.getStatus != 200) {
+            sys.error(s"Failed to download $url statusCode ${response.getStatus}")
+          }
+
+          val bytes = response.readEntity(classOf[Array[Byte]])
+          Files.write(target.toPath, bytes)
+        } finally {
+          response.close()
+          client.close()
+        }
       }
 
       Process(Seq("mkdir", "-p", extraDir.getAbsolutePath)).!!
@@ -82,7 +96,7 @@ lazy val microservice = Project(appName, file("."))
       println("Downloading GhostScript...")
       val ghostscript = new File(tempDir, "ghostscript.tgz")
       download(
-        s"https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/main/ghostscript-9.20-linux-x86_64.tgz",
+        s"https://raw.githubusercontent.com/pascal22p/pdf-generator-service-dependencies/main/ghostscript-9.20-linux-x86_64.tgz",
         ghostscript)
       println(s"Extracting GhostScript to ${binDir.getAbsolutePath}/gs-920-linux_x86_64")
       Process(Seq("tar", "zxf", tempDir + ghostscript.getName, "-C", binDir.getAbsolutePath, "--strip-components", "1")).!!
@@ -92,7 +106,7 @@ lazy val microservice = Project(appName, file("."))
       println("Downloading wkhtmltopdf...")
       val wkhtmltox = new File(tempDir, "wkhtmltopdf.tgz")
       download(
-        "https://raw.githubusercontent.com/hmrc/pdf-generator-service-dependencies/main/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz",
+        "https://raw.githubusercontent.com/pascal22p/pdf-generator-service-dependencies/main/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz",
         wkhtmltox)
       println(s"Extracting wkhtmltopdf to ${extraDir.getAbsolutePath}/bin/wkhtmltopdf")
       Process(Seq("tar", "xJf", tempDir + wkhtmltox.getName, "-C", extraDir.getAbsolutePath, "--strip-components", "1")).!!

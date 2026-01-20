@@ -83,7 +83,7 @@ class ResourceHelper extends Logging {
     bos.close()
 
     tried match {
-      case Success(t) => logger.info(s"Successfully wrote $filename")
+      case Success(_) => logger.info(s"Successfully wrote $filename")
       case Failure(e) => {
         logger.error(s"Failed to write bytes for $filename error was ${e.getMessage}, ")
       }
