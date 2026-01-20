@@ -50,7 +50,6 @@ class PdfGeneratorController @Inject()(
         pdf => {
           pdfGeneratorService.generatePdf(pdf.html, pdf.forcePdfA) match {
             case Success(file) =>
-              Files.write("out.pdf", file)
               Future.successful(Ok.sendFile(file, inline = false, onClose = () => file.delete()))
             case Failure(e) =>
               Future.successful(BadRequest(e.getMessage))
