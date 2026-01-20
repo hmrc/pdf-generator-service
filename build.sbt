@@ -35,9 +35,6 @@ lazy val microservice = Project(appName, file("."))
     IntegrationTest / parallelExecution := false
   )
   .settings(
-    resolvers += Resolver.jcenterRepo
-  )
-  .settings(
     executableFilesInTar := Seq("wkhtmltopdf", "gs-920-linux_x86_64")
   )
   .settings(
