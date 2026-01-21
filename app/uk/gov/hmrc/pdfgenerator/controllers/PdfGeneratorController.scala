@@ -22,7 +22,6 @@ import play.api.mvc._
 import play.api.Logging
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import java.nio.file.Files
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
