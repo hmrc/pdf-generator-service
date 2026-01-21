@@ -23,7 +23,6 @@ import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
-import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
 import uk.gov.hmrc.pdfgenerator.utils.PdfGeneratorUnitSpec
 
@@ -32,15 +31,11 @@ import scala.util.Try
 class HealthCheckControllerSpec extends PdfGeneratorUnitSpec with GuiceOneAppPerTest with ScalaFutures {
 
   val mockPdfGeneratorService: PdfGeneratorService = mock[PdfGeneratorService]
-  val mockMetric: PdfGeneratorMetric = mock[PdfGeneratorMetric]
 
   val healthCheckController = new HealthCheckController(
     mockPdfGeneratorService,
-    mockMetric,
     stubControllerComponents()
   )
-
-  when(mockMetric.startHealthCheckTimer()).thenReturn(1L)
 
   private val mockFile = new File("./target/testFileToDelete")
   mockFile.createNewFile()
