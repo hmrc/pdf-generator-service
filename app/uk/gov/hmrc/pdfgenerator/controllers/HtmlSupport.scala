@@ -45,6 +45,14 @@ trait HtmlSupport {
 
   case class PdfForm(html: String, forcePdfA: Boolean)
 
+  object PdfForm {
+    def unapply(
+                 u: PdfForm
+               ): Some[(String, Boolean)] = Some(
+      u.html, u.forcePdfA
+    )
+  }
+
   def getPdfForm() = Form(
     mapping(
       "html"       -> html,

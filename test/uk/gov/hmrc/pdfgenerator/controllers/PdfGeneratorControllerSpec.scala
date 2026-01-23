@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.pdfgenerator.controllers
 
-import org.mockito.Mockito.when
-
 import java.io.File
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
@@ -25,7 +23,6 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.pdfgenerator.metrics.PdfGeneratorMetric
 import uk.gov.hmrc.pdfgenerator.resources._
 import uk.gov.hmrc.pdfgenerator.service.PdfGeneratorService
 import uk.gov.hmrc.pdfgenerator.utils.PdfGeneratorUnitSpec
@@ -34,15 +31,10 @@ import scala.util.Try
 
 class PdfGeneratorControllerSpec extends PdfGeneratorUnitSpec with GuiceOneAppPerTest with ScalaFutures {
 
-  val mockMetric: PdfGeneratorMetric = mock[PdfGeneratorMetric]
-
   val pdfGeneratorController = new PdfGeneratorController(
     new MockPdfGeneratorService(configuration),
-    stubControllerComponents(),
-    mockMetric
+    stubControllerComponents()
   )
-
-  when(mockMetric.startTimer()).thenReturn(1L)
 
   "POST /generate" should {
     "create pdf from a String of html sent in as a form element" in {

@@ -23,6 +23,8 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import scala.io.Source
 
+import scala.annotation.unused
+
 /**
   * Created by peter on 14/12/2016.
   */
@@ -60,7 +62,7 @@ class ResourceHelperSpec extends AnyWordSpec with Matchers {
     }
   }
 
-  private def setup(filename: String): File = {
+  private def setup(@unused filename: String): File = {
     val file = new File(psDefFullpath)
     file.deleteOnExit()
     if (file.exists()) file.delete()

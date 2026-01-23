@@ -3,14 +3,17 @@ resolvers += Resolver.url("HMRC-open-artefacts-ivy", url("https://open.artefacts
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "3.9.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "3.24.0")
 
-libraryDependencies ++= Seq("net.databinder.dispatch" %% "dispatch-core" % "0.13.4")
+libraryDependencies ++= Seq(
+  "jakarta.platform" % "jakarta.jakartaee-api" % "11.0.0",
+  "org.glassfish.jersey.core" % "jersey-client" % "3.1.3"
+)
 
-addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "2.2.0")
+addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "2.6.0")
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.19")
+addSbtPlugin("org.playframework" % "sbt-plugin" % "3.0.10")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.4.3")
 
-addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.16")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")

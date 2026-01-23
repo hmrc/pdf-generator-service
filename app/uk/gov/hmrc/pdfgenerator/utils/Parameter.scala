@@ -1,3 +1,19 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.pdfgenerator.utils
 
 /**
@@ -46,19 +62,23 @@ object Parameter {
   /**
     * Creates a new CommandOption with the specified name and default value
     */
-  def apply[T: ParamShow](commandName: String, defaultValue: T): Parameter[T] =
+  def apply[T: ParamShow](commandName: String, defaultValue: T): Parameter[T] = {
+    summon[ParamShow[T]] // intentionally unused, forces implicit resolution
     new Parameter[T] {
       override val name: String = commandName
       override val default: Option[T] = Some(defaultValue)
     }
+  }
 
   /**
     * Creates a new CommandOption with the specified name
     */
-  def apply[T: ParamShow](commandName: String): Parameter[T] =
+  def apply[T: ParamShow](commandName: String): Parameter[T] = {
+    summon[ParamShow[T]] // intentionally unused, forces implicit resolution
     new Parameter[T] {
       override val name: String = commandName
       override val default: Option[T] = None
     }
+  }
 
 }

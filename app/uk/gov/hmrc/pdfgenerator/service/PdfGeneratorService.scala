@@ -175,7 +175,6 @@ class PdfGeneratorService @Inject()(
     links.forall(link => validateUrl(link))
 
   private def generatePdfFromHtml(html: String, inputFileName: String, linksDisabled: Boolean): Try[File] = {
-    import java.io._
 
     Try {
       val pdf: Pdf = Pdf(
